@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  api:
+    container_name: orasci
+    build: .
+    restart: on-failure
+    volumes:
+      - ./:/webapps
+      - ./log/:/var/log/apps
+    ports:
+      - 5002:5002
+    environment:
+      - PYTHONUNBUFFERED=true
+    env_file:
+      - .env
+    command: supervisord -n -c /etc/supervisor.d/supervisord.conf
