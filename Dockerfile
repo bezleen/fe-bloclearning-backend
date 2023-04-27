@@ -15,4 +15,4 @@ COPY . /webapps
 
 WORKDIR /webapps
 
-ENTRYPOINT [ "supervisord", "-n", "-c", "/etc/supervisor.d/supervisord.conf" ]
+# ENTRYPOINT [ "supervisord", "-n", "-c", "/etc/supervisor.d/supervisord.conf" ]
