@@ -9,9 +9,9 @@ services:
       - ./:/webapps
       - ./log/:/var/log/apps
     ports:
-      - 5002:5002
+      - 7006:5002
     environment:
       - PYTHONUNBUFFERED=true
     env_file:
       - .env
-    command: supervisord -n -c /etc/supervisor.d/supervisord.conf
+    # command: supervisord -n -c /etc/supervisor.d/supervisord.conf
