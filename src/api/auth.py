@@ -27,22 +27,15 @@ class Login(Resource):
     @api.marshal_with(AuthMeta.resp_login)
     def post(self):
         data = marshal(request.get_json(), AuthMeta.in_login)
-        custom_id = py_.get(data, "custom_id")
 
-        access_token = ""
-        refresh_token = ""
-        uid = ""
-
-        return ResponseMsg.SUCCESS.to_json(data={
-            "access_token": access_token,
-            "refresh_token": refresh_token,
-            "_id": uid,
-            "server_time": tzware_timestamp()
-        })
+        resp = Controllers.Auth.authenticate_wallet_server_side("", "")
+        if not resp:
+            return ResponseMsg.INVALID.to_json(data={}), 400
+        return ResponseMsg.SUCCESS.to_json(data=resp), 200
 
 
-@ api.route('/refresh-token')
-@ api.doc(responses=AuthMeta.RESPONSE_CODE)
+@api.route('/refresh-token')
+@api.doc(responses=AuthMeta.RESPONSE_CODE)
 class RefreshToken(Resource):
     """
         Refresh token
@@ -63,8 +56,8 @@ class RefreshToken(Resource):
         })
 
 
-@ api.route('/server-time')
-@ api.doc(responses=AuthMeta.RESPONSE_CODE)
+@api.route('/server-time')
+@api.doc(responses=AuthMeta.RESPONSE_CODE)
 class ServerTime(Resource):
     """
         Get current server time
