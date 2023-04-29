@@ -17,12 +17,15 @@ class Meta(BaseMeta):
     })
 
     in_login = api.model('InputLogin', {
-        'custom_id': fields.String(description='Custom id')
+        'signature': fields.String(description='Signature'),
+        'public_key': fields.String(description='Public Key')
     })
 
     out_login = api.model('OutputLogin', {
         'access_token': fields.String(default=""),
         'refresh_token': fields.String(default=""),
+        '_id': fields.String(default=""),
+        'server_time': fields.Integer(),
     })
 
     resp_login = api.inherit("LoginResponse", response, {
