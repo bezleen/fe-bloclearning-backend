@@ -29,6 +29,7 @@ class Login(Resource):
         data = marshal(request.get_json(), AuthMeta.in_login)
         signature = py_.get(data, "signature")
         public_key = py_.get(data, "public_key")
+        print(data)
 
         resp = Controllers.Auth.authenticate_wallet_server_side(signature, public_key)
         if not resp:

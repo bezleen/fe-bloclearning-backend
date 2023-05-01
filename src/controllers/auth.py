@@ -21,6 +21,7 @@ class Authentication(object):
         server_time = tzware_datetime()
         # TODO: verify signature
         custom_id = signature
+        print(custom_id)
         custom_id_hash = funcs.ora_hash(custom_id)
         user_obj = Repo.mUser.get_item_with({"custom_id": custom_id_hash})
         user_obj = None
