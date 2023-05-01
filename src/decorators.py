@@ -2,8 +2,12 @@
 import json
 from functools import wraps
 from threading import Thread
+import pydash as py_
+from flask import request, current_app, abort
 
 
+from src.resp_code import ResponseMsg
+import src.controllers as Controllers
 from src.extensions import redis_cached
 
 
@@ -50,3 +54,25 @@ def cache_filter(timeout=86400, key_prefix='common', key_fields=[]):
         return wrapper
 
     return decorator
+
+
+def req_login(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        access_token = py_.get(request.headers, 'X-Authorization')
+        if not access_token:
+            return ResponseMsg.UNAUTHORIZED.to_json(), 401
+
+        token_info = Controllers.Auth.decode_jwt(access_token)
+        user_id = py_.get(token_info, "_id")
+
+        if not user_id:
+            return ResponseMsg.UNAUTHORIZED.to_json(), 401
+
+        # check conflict
+        is_conflict = Controllers.User.check_conflict_token(user_id, access_token)
+        if is_conflict:
+            return ResponseMsg.LOGIN_CONFLICT.to_json(), 409
+
+        return f(user_id=user_id, *args, **kwargs)
+    return wrapper

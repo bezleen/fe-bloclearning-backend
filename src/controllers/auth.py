@@ -1,4 +1,5 @@
 import datetime as dt
+import traceback
 
 import names
 import jwt
@@ -19,33 +20,36 @@ class Authentication(object):
     def authenticate_wallet_server_side(cls, signature, public_key):
         server_time = tzware_datetime()
         # TODO: verify signature
-        # custom_id_hash = funcs.ora_hash(custom_id)
-        # user_obj = Repo.mUser.get_item_with({"custom_id": custom_id_hash})
+        custom_id = signature
+        custom_id_hash = funcs.ora_hash(custom_id)
+        user_obj = Repo.mUser.get_item_with({"custom_id": custom_id_hash})
         user_obj = None
 
         if not user_obj:
             user_id = ObjectId()
             name = names.get_first_name()
             name_idx = funcs.safe_string(name)
-            # Repo.mUser.insert({
-            #     "_id": user_id,
-            #     "custom_id": custom_id_hash,
-            #     "name_idx": name_idx,
-            #     "internal": {
-            #         "last_access_token": "",
-            #         "last_login": server_time,
-            #     },
-            #     "read_only": {
-            #         "name": name,
-            #         "role": "default"
-            #     }
-            # })
+            access_token = cls.generate_access_token(str(user_id), is_refresh_token=False)
+            refresh_token = cls.generate_access_token(str(user_id), is_refresh_token=True)
+            Repo.mUser.insert({
+                "_id": user_id,
+                "custom_id": custom_id_hash,
+                "name_idx": name_idx,
+                "internal": {
+                    "last_access_token": access_token,
+                    "last_login": server_time,
+                },
+                "read_only": {
+                    "name": name,
+                    "role": "default"
+                }
+            })
         else:
             user_id = py_.get(user_obj, '_id')
+            access_token = cls.generate_access_token(str(user_id), is_refresh_token=False)
+            refresh_token = cls.generate_access_token(str(user_id), is_refresh_token=True)
 
         user_id = py_.to_string(user_id)
-        access_token = cls.generate_access_token(user_id, is_refresh_token=False)
-        refresh_token = cls.generate_access_token(user_id, is_refresh_token=True)
         response = {
             "access_token": access_token,
             "refresh_token": refresh_token,
@@ -54,7 +58,7 @@ class Authentication(object):
         }
         return response
 
-    @ classmethod
+    @classmethod
     def generate_access_token(cls, user_id, is_refresh_token=False):
         if not user_id:
             return None
@@ -81,7 +85,16 @@ class Authentication(object):
         token = cls.generate_jwt_token(payload_jwt)
         return token
 
-    @ classmethod
+    @classmethod
     def generate_jwt_token(cls, payload):
         encoded = jwt.encode(payload, Conf.SECRET_KEY, algorithm="HS256")
         return encoded
+
+    @classmethod
+    def decode_jwt(self, token, options={}):
+        try:
+            payload = jwt.decode(token, Conf.SECRET_KEY, ["HS256"], options=options)
+            return payload
+        except:
+            traceback.print_exc()
+            return None
