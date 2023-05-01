@@ -27,8 +27,10 @@ class Login(Resource):
     @api.marshal_with(AuthMeta.resp_login)
     def post(self):
         data = marshal(request.get_json(), AuthMeta.in_login)
+        signature = py_.get(data, "signature")
+        public_key = py_.get(data, "public_key")
 
-        resp = Controllers.Auth.authenticate_wallet_server_side("", "")
+        resp = Controllers.Auth.authenticate_wallet_server_side(signature, public_key)
         if not resp:
             return ResponseMsg.INVALID.to_json(data={}), 400
         return ResponseMsg.SUCCESS.to_json(data=resp), 200
