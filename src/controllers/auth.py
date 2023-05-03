@@ -43,7 +43,7 @@ class Authentication(object):
                 },
                 "read_only": {
                     "name": name,
-                    "role": Enums.UserRole.DAO_MEMBER
+                    "role": Enums.UserRole.DAO_MEMBER.value
                 }
             })
         else:
