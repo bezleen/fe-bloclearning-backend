@@ -20,7 +20,7 @@ class Authentication(object):
     @classmethod
     def authenticate_wallet_server_side(cls, signature, public_key, timestamp, address):
         server_time = tzware_datetime()
-        custom_id = cls.verify_signature(cls, signature, public_key, timestamp, address)
+        custom_id = cls.verify_signature(signature, public_key, timestamp, address)
         if not custom_id:
             return
         custom_id_hash = funcs.ora_hash(custom_id)
