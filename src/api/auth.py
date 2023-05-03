@@ -43,19 +43,17 @@ class RefreshToken(Resource):
     """
         Refresh token
     """
-    @ api.expect(AuthMeta.in_refresh_token)
+    @api.expect(AuthMeta.in_refresh_token)
     def post(self):
         data = marshal(request.get_json(), AuthMeta.in_refresh_token)
         refresh_token = py_.get(data, "refresh_token")
         if not refresh_token:
             return ResponseMsg.INVALID.to_json(data={}), 400
-
-        access_token = ""
-        refresh_token = ""
+        new_access_token, new_refresh_token = Controllers.Auth.refresh_token(refresh_token)
 
         return ResponseMsg.SUCCESS.to_json(data={
-            "access_token": access_token,
-            "refresh_token": refresh_token
+            "access_token": new_access_token,
+            "refresh_token": new_refresh_token
         })
 
 

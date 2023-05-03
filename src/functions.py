@@ -11,3 +11,9 @@ def safe_string(string: str) -> str:
     string = string.strip()
     string = string.lower()
     return string
+
+
+def safe_name(string: str) -> str:
+    string = string.strip()
+    string = string[:20]
+    return string

@@ -1,3 +1,4 @@
+import random
 import datetime as dt
 import traceback
 
@@ -25,7 +26,6 @@ class Authentication(object):
             return
         custom_id_hash = funcs.ora_hash(custom_id)
         user_obj = Repo.mUser.get_item_with({"custom_id": custom_id_hash})
-        user_obj = None
 
         if not user_obj:
             user_id = ObjectId()
@@ -33,23 +33,34 @@ class Authentication(object):
             name_idx = funcs.safe_string(name)
             access_token = cls.generate_access_token(str(user_id), is_refresh_token=False)
             refresh_token = cls.generate_access_token(str(user_id), is_refresh_token=True)
+            avatar = random.choice(Enums.Avatar.list())
             Repo.mUser.insert({
                 "_id": user_id,
                 "custom_id": custom_id_hash,
                 "name_idx": name_idx,
                 "internal": {
                     "last_access_token": access_token,
-                    "last_login": server_time,
+                    "last_login": int(server_time.timestamp()),
                 },
                 "read_only": {
                     "name": name,
-                    "role": Enums.UserRole.DAO_MEMBER.value
+                    "role": Enums.UserRole.DAO_MEMBER.value,
+                    "avatar": avatar
                 }
             })
         else:
             user_id = py_.get(user_obj, '_id')
             access_token = cls.generate_access_token(str(user_id), is_refresh_token=False)
             refresh_token = cls.generate_access_token(str(user_id), is_refresh_token=True)
+            Repo.mUser.update_raw(
+                {"_id": user_id},
+                {
+                    "$set": {
+                        "internal.last_access_token": access_token,
+                        "last_login": int(server_time.timestamp())
+                    }
+                }
+            )
 
         user_id = py_.to_string(user_id)
         response = {
@@ -60,7 +71,7 @@ class Authentication(object):
         }
         return response
 
-    @classmethod
+    @ classmethod
     def generate_access_token(cls, user_id, is_refresh_token=False):
         if not user_id:
             return None
@@ -87,12 +98,12 @@ class Authentication(object):
         token = cls.generate_jwt_token(payload_jwt)
         return token
 
-    @classmethod
+    @ classmethod
     def generate_jwt_token(cls, payload):
         encoded = jwt.encode(payload, Conf.SECRET_KEY, algorithm="HS256")
         return encoded
 
-    @classmethod
+    @ classmethod
     def decode_jwt(self, token, options={}):
         try:
             payload = jwt.decode(token, Conf.SECRET_KEY, ["HS256"], options=options)
@@ -101,7 +112,36 @@ class Authentication(object):
             traceback.print_exc()
             return None
 
-    @classmethod
+    @ classmethod
     def verify_signature(cls, signature, public_key, timestamp, address):
         # TODO: verify signature
         return address
+
+    @classmethod
+    def refresh_token(cls, refresh_token):
+        """refresh token
+
+        Args:
+            refresh_token (str)
+
+        Returns:
+            (access_token, refresh_token) tuble
+        """
+        account_info = cls.decode_jwt(refresh_token)
+        is_accessToken = py_.get(account_info, "access_token")
+        uid = py_.get(account_info, str("_id"))
+        if is_accessToken:
+            return
+
+        new_access_token = cls.generate_access_token(str(uid), is_refresh_token=False)
+        new_refresh_token = cls.generate_access_token(str(uid), is_refresh_token=True)
+        Repo.mUser.update_raw(
+            {"_id": ObjectId(uid)},
+            {
+                "$set": {
+                    "internal.last_access_token": new_access_token,
+                    "last_login": tzware_timestamp()
+                }
+            }
+        )
+        return new_access_token, new_refresh_token

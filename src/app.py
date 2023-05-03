@@ -21,6 +21,8 @@ def create_app(config=None, app_name=None):
         app_name = DefaultConfig.PROJECT
 
     app = SecureFlask(app_name, instance_relative_config=True, md5_endpoints=DefaultConfig.MD5_ENDPOINTS)
+    app.static_url_path = ''
+    app.static_folder = 'src/static'
     configure_app(app, config)
     configure_extensions(app)
     configure_blueprints(app)
