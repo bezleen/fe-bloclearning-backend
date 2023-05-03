@@ -29,9 +29,9 @@ class Login(Resource):
         data = marshal(request.get_json(), AuthMeta.in_login)
         signature = py_.get(data, "signature")
         public_key = py_.get(data, "public_key")
-        print(data)
-
-        resp = Controllers.Auth.authenticate_wallet_server_side(signature, public_key)
+        timestamp = py_.get(data, 'timestamp')
+        address = py_.get(data, 'address')
+        resp = Controllers.Auth.authenticate_wallet_server_side(signature, public_key, timestamp, address)
         if not resp:
             return ResponseMsg.INVALID.to_json(data={}), 400
         return ResponseMsg.SUCCESS.to_json(data=resp), 200

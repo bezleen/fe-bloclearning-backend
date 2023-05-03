@@ -14,3 +14,8 @@ class EnumBase(enum.Enum):
 class Example(EnumBase):
     EXAMPLE1 = "example1"
     EXAMPLE2 = "example2"
+
+
+class UserRole(EnumBase):
+    DAO_MEMBER = "dao_member"
+    RESEARCHER = "researcher"

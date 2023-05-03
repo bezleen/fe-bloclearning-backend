@@ -17,8 +17,10 @@ class Meta(BaseMeta):
     })
 
     in_login = api.model('InputLogin', {
-        'signature': fields.String(description='Signature'),
-        'public_key': fields.String(description='Public Key')
+        'signature': fields.String(description='Signature', required=True),
+        'public_key': fields.String(description='Public Key', required=True),
+        'timestamp': fields.Integer(description="Timestamp", required=True),
+        'address': fields.String(description='Address', required=True)
     })
 
     out_login = api.model('OutputLogin', {

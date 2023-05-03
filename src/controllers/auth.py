@@ -9,6 +9,7 @@ import pydash as py_
 
 import src.functions as funcs
 import src.models.repo as Repo
+import src.enums as Enums
 import src.constants as Consts
 from src.config import DefaultConfig as Conf
 from src.utils.util_datetime import tzware_datetime, tzware_timestamp
@@ -17,11 +18,11 @@ from src.utils.util_datetime import tzware_datetime, tzware_timestamp
 class Authentication(object):
 
     @classmethod
-    def authenticate_wallet_server_side(cls, signature, public_key):
+    def authenticate_wallet_server_side(cls, signature, public_key, timestamp, address):
         server_time = tzware_datetime()
-        # TODO: verify signature
-        custom_id = signature
-        print(custom_id)
+        custom_id = cls.verify_signature(cls, signature, public_key, timestamp, address)
+        if not custom_id:
+            return
         custom_id_hash = funcs.ora_hash(custom_id)
         user_obj = Repo.mUser.get_item_with({"custom_id": custom_id_hash})
         user_obj = None
@@ -42,7 +43,7 @@ class Authentication(object):
                 },
                 "read_only": {
                     "name": name,
-                    "role": "default"
+                    "role": Enums.UserRole.DAO_MEMBER
                 }
             })
         else:
@@ -99,3 +100,8 @@ class Authentication(object):
         except:
             traceback.print_exc()
             return None
+
+    @classmethod
+    def verify_signature(cls, signature, public_key, timestamp, address):
+        # TODO: verify signature
+        return address

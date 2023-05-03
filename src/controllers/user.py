@@ -20,3 +20,7 @@ class User(object):
     def check_conflict_token(cls, user_id, access_token):
 
         return False
+
+    @classmethod
+    def get_profile(cls, user_id):
+        return
