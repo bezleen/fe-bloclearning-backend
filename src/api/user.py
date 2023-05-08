@@ -38,7 +38,11 @@ class User(Resource):
         """
         data = marshal(request.get_json(), UserMeta.in_update_profile)
         new_name = py_.get(data, "name")
-        Controllers.User.update_profile(user_id, name=new_name)
+        new_occupation = py_.get(data, "occupation")
+        new_work_at = py_.get(data, "work_at")
+        new_location = py_.get(data, "location")
+        new_contact = py_.get(data, "contact")
+        Controllers.User.update_profile(user_id, name=new_name, occupation=None, work_at=None, location=None, contact=None)
         return ResponseMsg.SUCCESS.to_json(data={}), 200
 
 

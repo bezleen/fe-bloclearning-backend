@@ -36,17 +36,29 @@ class User(object):
             "name": py_.get(user_info, "read_only.name"),
             "role": py_.get(user_info, "read_only.role"),
             "avatar": py_.get(user_info, "read_only.avatar"),
+            'occupation': py_.get(user_info, "read_only.occupation"),
+            'work_at': py_.get(user_info, "read_only.work_at"),
+            'location': py_.get(user_info, "read_only.location"),
+            'contact': py_.get(user_info, "read_only.contact"),
             "last_login": py_.get(user_info, "internal.last_login"),
             "first_login": py_.to_integer(py_.get(user_info, "date_created").timestamp())
         }
         return profile
 
     @classmethod
-    def update_profile(cls, user_id, name=None):
+    def update_profile(cls, user_id, name=None, occupation=None, work_at=None, location=None, contact=None):
         _update = {}
         if name:
             name = funcs.safe_name(name)
             _update.update({"read_only.name": name, "name_idx": funcs.safe_string(name)})
+        if occupation:
+            _update.update({"read_only.occupation": occupation})
+        if work_at:
+            _update.update({"read_only.work_at": work_at})
+        if location:
+            _update.update({"read_only.location": location})
+        if contact and funcs.is_valid_phone_number(contact):
+            _update.update({"read_only.contact": contact})
 
         if not _update:
             return
