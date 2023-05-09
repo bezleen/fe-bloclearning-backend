@@ -11,6 +11,7 @@ from src.schemas import ProjectsMeta
 
 
 from src.resp_code import ResponseMsg
+from src.middlewares.http import enable_cors
 
 
 api = ProjectsMeta.api
@@ -24,6 +25,7 @@ class Mails(Resource):
     """
     @api.marshal_with(ProjectsMeta.response)
     @Decorators.req_login
+    @enable_cors
     def get(self, user_id):
         all_projects = Controllers.Projects.get_all_projects()
         return ResponseMsg.SUCCESS.to_json(data={"projects": all_projects})
@@ -36,6 +38,7 @@ class Mail(Resource):
         Get project by id
     """
     @api.marshal_with(ProjectsMeta.response)
+    @enable_cors
     @Decorators.req_login
     def get(self, project_id, user_id):
         project = Controllers.Projects.get_project_by_id(project_id)

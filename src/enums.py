@@ -20,6 +20,7 @@ class UserRole(EnumBase):
     DAO_MEMBER = "dao_member"
     RESEARCHER = "researcher"
     THIRD_PARTY = "third_party"
+    ADMIN = "admin"
 
 
 class Avatar(EnumBase):
@@ -27,3 +28,8 @@ class Avatar(EnumBase):
     AVATAR_2 = "static/avatar_2.webp"
     AVATAR_3 = "static/avatar_3.webp"
     AVATAR_4 = "static/avatar_4.webp"
+
+
+class FormType(EnumBase):
+    OFFER_RESEARCHER = "offer_researcher"
+    OFFER_THIRD_PARTY = "offer_third_party"
