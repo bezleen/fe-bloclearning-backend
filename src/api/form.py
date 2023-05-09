@@ -75,7 +75,7 @@ class User(Resource):
         return ResponseMsg.SUCCESS.to_json(data={}), 200
 
 
-@api.route('/upload-id-card/<side>')
+@api.route('/upload-attached-file/<form_id>')
 @api.doc(responses=FormMeta.RESPONSE_CODE)
 class User(Resource):
 
@@ -83,14 +83,14 @@ class User(Resource):
     @enable_cors
     def post(self, side, user_id):
         """
-            Upload Front and Back of the IdCard
+            Upload Attached File
         """
         form_id = py_.get(request.args, "form_id")
         try:
-            if 'file' not in request.files or side not in Enums.CardIdSide.list():
+            if 'file' not in request.files:
                 return ResponseMsg.INVALID.to_json(), 400
             file = request.files["file"]
-            Controllers.Form.upload_card_id_img(user_id, form_id, file, side)
+            Controllers.Form.upload_attached_file(user_id, form_id, file)
         except Exception as e:
             return ResponseMsg.INVALID.to_json(), 400
         return ResponseMsg.SUCCESS.to_json(data={}), 200

@@ -33,3 +33,8 @@ class Avatar(EnumBase):
 class FormType(EnumBase):
     OFFER_RESEARCHER = "offer_researcher"
     OFFER_THIRD_PARTY = "offer_third_party"
+
+
+class CardIdSide(EnumBase):
+    FRONT = "front"
+    BACK = "back"
