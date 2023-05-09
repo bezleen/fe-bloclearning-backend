@@ -5,6 +5,8 @@ import logging
 import logging.config
 from flask import Flask, request, jsonify, current_app
 from src.flask_secure import SecureFlask
+from flask_cors import CORS
+
 
 from .config import DefaultConfig, LoggingConfig
 from .extensions import (
@@ -21,6 +23,7 @@ def create_app(config=None, app_name=None):
         app_name = DefaultConfig.PROJECT
 
     app = SecureFlask(app_name, instance_relative_config=True, md5_endpoints=DefaultConfig.MD5_ENDPOINTS)
+    CORS(app)
     app.static_url_path = ''
     app.static_folder = 'src/static'
     configure_app(app, config)
