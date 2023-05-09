@@ -26,7 +26,7 @@ class Mails(Resource):
     @api.marshal_with(ProjectsMeta.response)
     # @Decorators.req_login
     @enable_cors
-    def get(self, user_id):
+    def get(self):
         all_projects = Controllers.Projects.get_all_projects()
         return ResponseMsg.SUCCESS.to_json(data={"projects": all_projects})
 
@@ -40,6 +40,6 @@ class Mail(Resource):
     @api.marshal_with(ProjectsMeta.response)
     # @Decorators.req_login
     @enable_cors
-    def get(self, project_id, user_id):
+    def get(self, project_id):
         project = Controllers.Projects.get_project_by_id(project_id)
         return ResponseMsg.SUCCESS.to_json(data={"project": project})
