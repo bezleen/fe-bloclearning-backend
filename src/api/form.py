@@ -45,7 +45,7 @@ class User(Resource):
     @enable_cors
     def post(self, user_id):
         """
-            Update User Profile
+            Submit a form to become Third Party
         """
         data = marshal(request.get_json(), FormMeta.in_offer_researcher)
         form_obj = Controllers.Form.submit_form_third_party(user_id, data)
@@ -81,11 +81,10 @@ class User(Resource):
 
     @Decorators.req_login
     @enable_cors
-    def post(self, side, user_id):
+    def post(self, form_id, user_id):
         """
             Upload Attached File
         """
-        form_id = py_.get(request.args, "form_id")
         try:
             if 'file' not in request.files:
                 return ResponseMsg.INVALID.to_json(), 400
@@ -94,3 +93,105 @@ class User(Resource):
         except Exception as e:
             return ResponseMsg.INVALID.to_json(), 400
         return ResponseMsg.SUCCESS.to_json(data={}), 200
+
+
+@api.route('/publish/<form_id>')
+@api.doc(responses=FormMeta.RESPONSE_CODE)
+class User(Resource):
+
+    @Decorators.req_login
+    @enable_cors
+    def post(self, form_id, user_id):
+        """
+            Publish A Form
+        """
+        Controllers.Form.publish_form(user_id, form_id)
+        return ResponseMsg.SUCCESS.to_json(data={}), 200
+
+
+@api.route('/')
+@api.doc(responses=FormMeta.RESPONSE_CODE)
+class User(Resource):
+
+    @Decorators.req_admin
+    @enable_cors
+    def get(self, user_id):
+        """
+            Admin Fetch Forms
+        """
+        page = py_.get(request.args, "page", 1)
+        page_size = py_.get(request.args, "page_size", 10)
+        forms = Controllers.Form.fetch_forms(page, page_size)
+        return ResponseMsg.SUCCESS.to_json(data=forms), 200
+
+
+@api.route('/<form_id>')
+@api.doc(responses=FormMeta.RESPONSE_CODE)
+class User(Resource):
+
+    @Decorators.req_admin
+    @enable_cors
+    def get(self, form_id, user_id):
+        """
+            Admin Get Form Detail
+        """
+        form = Controllers.Form.get_form_by_id(form_id)
+        return ResponseMsg.SUCCESS.to_json(data=form), 200
+
+
+@api.route('/approve/<form_id>')
+@api.doc(responses=FormMeta.RESPONSE_CODE)
+class User(Resource):
+
+    @Decorators.req_admin
+    @enable_cors
+    def get(self, form_id, user_id):
+        """
+            Admin Approve Form
+        """
+        Controllers.Form.approve_form(form_id)
+        return ResponseMsg.SUCCESS.to_json(data={}), 200
+
+
+@api.route('/reject/<form_id>')
+@api.doc(responses=FormMeta.RESPONSE_CODE)
+class User(Resource):
+
+    @Decorators.req_admin
+    @enable_cors
+    def get(self, form_id, user_id):
+        """
+            Admin Reject Form
+        """
+        Controllers.Form.reject_form(form_id)
+        return ResponseMsg.SUCCESS.to_json(data={}), 200
+
+
+@api.route('/me')
+@api.doc(responses=FormMeta.RESPONSE_CODE)
+class User(Resource):
+
+    @Decorators.req_login
+    @enable_cors
+    def get(self, user_id):
+        """
+            Fetch my forms
+        """
+        page = py_.get(request.args, "page", 1)
+        page_size = py_.get(request.args, "page_size", 10)
+        forms = Controllers.Form.fetch_my_forms(user_id, page, page_size)
+        return ResponseMsg.SUCCESS.to_json(data=forms), 200
+
+
+@api.route('/me/<form_id>')
+@api.doc(responses=FormMeta.RESPONSE_CODE)
+class User(Resource):
+
+    @Decorators.req_login
+    @enable_cors
+    def get(self, form_id, user_id):
+        """
+            Get my form by id
+        """
+        form = Controllers.Form.get_form_by_id(user_id, form_id)
+        return ResponseMsg.SUCCESS.to_json(data=form), 200

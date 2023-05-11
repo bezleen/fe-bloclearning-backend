@@ -31,8 +31,8 @@ class Authentication(object):
             user_id = ObjectId()
             name = names.get_first_name()
             name_idx = funcs.safe_string(name)
-            access_token = cls.generate_access_token(str(user_id), is_refresh_token=False)
-            refresh_token = cls.generate_access_token(str(user_id), is_refresh_token=True)
+            access_token = cls.generate_access_token(str(user_id), Enums.UserRole.DAO_MEMBER.value, is_refresh_token=False)
+            refresh_token = cls.generate_access_token(str(user_id), Enums.UserRole.DAO_MEMBER.value, is_refresh_token=True)
             avatar = random.choice(Enums.Avatar.list())
             Repo.mUser.insert({
                 "_id": user_id,
@@ -49,9 +49,11 @@ class Authentication(object):
                 }
             })
         else:
+
             user_id = py_.get(user_obj, '_id')
-            access_token = cls.generate_access_token(str(user_id), is_refresh_token=False)
-            refresh_token = cls.generate_access_token(str(user_id), is_refresh_token=True)
+            user_role = py_.get(user_obj, "read_only.role")
+            access_token = cls.generate_access_token(str(user_id), user_role, is_refresh_token=False)
+            refresh_token = cls.generate_access_token(str(user_id), user_role, is_refresh_token=True)
             Repo.mUser.update_raw(
                 {"_id": user_id},
                 {
@@ -72,7 +74,7 @@ class Authentication(object):
         return response
 
     @ classmethod
-    def generate_access_token(cls, user_id, is_refresh_token=False):
+    def generate_access_token(cls, user_id, role, is_refresh_token=False):
         if not user_id:
             return None
 
@@ -93,6 +95,7 @@ class Authentication(object):
             "iat": tzware_timestamp(),
             "app_id": "coup",
             "_id": user_id,
+            "role": role,
             "access_token": is_access_token
         }
         token = cls.generate_jwt_token(payload_jwt)
@@ -131,10 +134,13 @@ class Authentication(object):
         is_accessToken = py_.get(account_info, "access_token")
         uid = py_.get(account_info, str("_id"))
         if is_accessToken:
-            return
-
-        new_access_token = cls.generate_access_token(str(uid), is_refresh_token=False)
-        new_refresh_token = cls.generate_access_token(str(uid), is_refresh_token=True)
+            return None, None
+        user_obj = Repo.mUser.get_item_with({"_id": ObjectId(uid)})
+        if not user_obj:
+            return None, None
+        user_role = py_.get(user_obj, "read_only.role")
+        new_access_token = cls.generate_access_token(str(uid), user_role, is_refresh_token=False)
+        new_refresh_token = cls.generate_access_token(str(uid), user_role, is_refresh_token=True)
         Repo.mUser.update_raw(
             {"_id": ObjectId(uid)},
             {

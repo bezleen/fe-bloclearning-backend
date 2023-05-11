@@ -35,6 +35,33 @@ class FormType(EnumBase):
     OFFER_THIRD_PARTY = "offer_third_party"
 
 
+class FormStatus(EnumBase):
+    PENDING = "pending"
+    UNPUBLISHED = "unpublished"
+    DONE = "done"
+    REJECTED = "rejected"
+
+
 class CardIdSide(EnumBase):
     FRONT = "front"
     BACK = "back"
+
+
+class ProjectStage(EnumBase):
+    PRE_QUALIFICATION = "pre_qualified"
+    REVIEWING = "reviewing"
+    FUNDING = "funding"
+    EXECUTING = "executing"
+    COMPLETE = "complete"
+
+
+class ExecutingStatus(EnumBase):
+    EARLY = "early"
+    TESTING = "testing"
+    ALMOST_DONE = "almost_done"
+
+
+class CompleteStatus(EnumBase):
+    CLAIMABLE = "claimable"
+    UNCLAIMABLE = "unclaimable"
+    PENDING = "pending"

@@ -27,7 +27,9 @@ class Mails(Resource):
     # @Decorators.req_login
     @enable_cors
     def get(self):
-        all_projects = Controllers.Projects.get_all_projects()
+        page = py_.get(request.args, "page", 1)
+        page_size = py_.get(request.args, "page_size", 10)
+        all_projects = Controllers.Projects.get_all_projects(page, page_size)
         return ResponseMsg.SUCCESS.to_json(data={"projects": all_projects})
 
 
@@ -43,3 +45,6 @@ class Mail(Resource):
     def get(self, project_id):
         project = Controllers.Projects.get_project_by_id(project_id)
         return ResponseMsg.SUCCESS.to_json(data={"project": project})
+
+
+# TODO: edit form
