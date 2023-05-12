@@ -47,8 +47,8 @@ class Mail(Resource):
         return ResponseMsg.SUCCESS.to_json(data={"project": project})
 
 
-@ api.route('/initialize')
-@ api.doc(responses=ProjectsMeta.RESPONSE_CODE)
+@api.route('/initialize')
+@api.doc(responses=ProjectsMeta.RESPONSE_CODE)
 class Mail(Resource):
 
     @api.expect(ProjectsMeta.in_initialize)
@@ -65,4 +65,23 @@ class Mail(Resource):
             return ResponseMsg.INVALID.to_json(), 400
         return ResponseMsg.SUCCESS.to_json(data=result)
 
-# TODO: edit form
+
+@api.route('/upload_thumbnail/<project_id>')
+@api.doc(responses=ProjectsMeta.RESPONSE_CODE)
+class Mail(Resource):
+
+    @api.marshal_with(ProjectsMeta.response)
+    @Decorators.req_login
+    @enable_cors
+    def post(self, project_id, user_id):
+        """
+            Upload Thumbnail Of Project
+        """
+        try:
+            if 'file' not in request.files:
+                return ResponseMsg.INVALID.to_json(), 400
+            file = request.files["file"]
+            Controllers.Projects.upload_thumbnail(user_id, project_id, file)
+        except Exception as e:
+            return ResponseMsg.INVALID.to_json(), 400
+        return ResponseMsg.SUCCESS.to_json(data={}), 200

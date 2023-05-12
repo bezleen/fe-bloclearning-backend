@@ -42,7 +42,7 @@ class Form(object):
             return
         candidate_info = Controllers.User.get_profile(user_id)
         current_role = py_.get(candidate_info, "role")
-        if current_role == Enums.FormType.OFFER_RESEARCHER.value:
+        if current_role in [Enums.UserRole.RESEARCHER.value, Enums.UserRole.ADMIN.value]:
             return
         # TODO: parse the value from data
         custom_data = {}
@@ -58,7 +58,7 @@ class Form(object):
             "status": Enums.FormStatus.UNPUBLISHED.value
         }
         Repo.mForms.insert(obj)
-        return {"form_id": _id}
+        return {"form_id": str(_id)}
 
     @classmethod
     def submit_form_third_party(cls, user_id, data):

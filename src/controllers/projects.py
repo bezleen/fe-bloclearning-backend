@@ -1,3 +1,4 @@
+import os
 import random
 import datetime
 from dateutil.relativedelta import relativedelta
@@ -123,3 +124,49 @@ class Projects(object):
         }
         Repo.mProjects.insert(project_obj)
         return {"_id": str(project_id)}
+
+    @classmethod
+    def check_allowed_file(cls, file_name):
+        return file_name.split(".")[-1] in ['png', 'jpg', 'jpeg', 'webp']
+
+    @classmethod
+    def delete_old_avatar(cls, file_name):
+        file_path = os.path.join(Consts.UPLOAD_FOLDER, file_name)
+        if os.path.exists(file_path):
+            # delete the file
+            os.remove(file_path)
+        return
+
+    @classmethod
+    def upload_thumbnail(cls, user_id, project_id, file):
+        project_info = Repo.mProjects.get_item_with(
+            {"_id": ObjectId(project_id)})
+        author_id = py_.get(project_info, "author_id")
+        if str(author_id) != str(user_id):
+            raise ValueError("Conflict Auth")
+        if file.filename == '':
+            raise ValueError("No file selected for uploading")
+        if file and cls.check_allowed_file(file.filename):
+            true_filename = f"{ObjectId()}.webp"
+            path = os.path.join(Consts.UPLOAD_FOLDER, true_filename)
+            file.save(path)
+        else:
+            raise ValueError("File is not allowed")
+        # current thumbnail path
+        thumbnail = py_.get(project_info, "thumbnail").split("static/")[-1]
+        if thumbnail:
+            # delete current_thumbnail
+            current_thumbnail_path = thumbnail.split("static/")[-1]
+            cls.delete_old_avatar(current_thumbnail_path)
+        # save url_prefix
+        Repo.mProjects.update_raw(
+            {
+                "_id": ObjectId(project_id)
+            },
+            {
+                "$set": {
+                    "thumbnail": f"static/{true_filename}"
+                }
+            }
+        )
+        return

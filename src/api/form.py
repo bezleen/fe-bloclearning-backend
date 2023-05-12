@@ -122,7 +122,8 @@ class User(Resource):
         page = py_.get(request.args, "page", 1)
         page_size = py_.get(request.args, "page_size", 10)
         forms = Controllers.Form.fetch_forms(page, page_size)
-        return ResponseMsg.SUCCESS.to_json(data=forms), 200
+        print(forms)
+        return ResponseMsg.SUCCESS.to_json(data={"forms": forms}), 200
 
 
 @api.route('/<form_id>')
@@ -180,7 +181,7 @@ class User(Resource):
         page = py_.get(request.args, "page", 1)
         page_size = py_.get(request.args, "page_size", 10)
         forms = Controllers.Form.fetch_my_forms(user_id, page, page_size)
-        return ResponseMsg.SUCCESS.to_json(data=forms), 200
+        return ResponseMsg.SUCCESS.to_json(data={"forms": forms}), 200
 
 
 @api.route('/me/<form_id>')
