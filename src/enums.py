@@ -48,11 +48,14 @@ class CardIdSide(EnumBase):
 
 
 class ProjectStage(EnumBase):
+    UNPUBLISHED = "unpublished"
+    PENDING = "pending"
+    REJECTED = "rejected"
     PRE_QUALIFICATION = "pre_qualified"
     REVIEWING = "reviewing"
     FUNDING = "funding"
     EXECUTING = "executing"
-    COMPLETE = "complete"
+    COMPLETED = "completed"
 
 
 class ExecutingStatus(EnumBase):

@@ -44,15 +44,20 @@ class Projects(object):
         for project in all_projects:
             project_stage = py_.get(project, "stage")
             if project_stage == Enums.ProjectStage.PRE_QUALIFICATION.value:
-                status = py_.get(project, f"stage_detail.{project_stage}.approval", 0.0)
+                status = py_.get(
+                    project, f"stage_detail.{project_stage}.approval", 0.0)
             elif project_stage == Enums.ProjectStage.REVIEWING.value:
-                status = py_.get(project, f"stage_detail.{project_stage}.approval", 0.0)
+                status = py_.get(
+                    project, f"stage_detail.{project_stage}.approval", 0.0)
             elif project_stage == Enums.ProjectStage.FUNDING.value:
-                status = py_.get(project, f"stage_detail.{project_stage}.amount", 0.0)
+                status = py_.get(
+                    project, f"stage_detail.{project_stage}.amount", 0.0)
             elif project_stage == Enums.ProjectStage.EXECUTING.value:
-                status = py_.get(project, f"stage_detail.{project_stage}.status", "unknown")
-            elif project_stage == Enums.ProjectStage.COMPLETE.value:
-                status = py_.get(project, f"stage_detail.{project_stage}.status", "unknown")
+                status = py_.get(
+                    project, f"stage_detail.{project_stage}.status", "unknown")
+            elif project_stage == Enums.ProjectStage.COMPLETED.value:
+                status = py_.get(
+                    project, f"stage_detail.{project_stage}.status", "unknown")
             else:
                 status = "unknown"
             project_summary = {
@@ -90,3 +95,31 @@ class Projects(object):
             "date_created": int(py_.get(project, "date_created").timestamp())
         }
         return project_resp
+
+    @classmethod
+    def init_project(cls, user_id, data):
+        # extract data
+        title = py_.get(data, "title")
+        main_tag = py_.get(data, "main_tag")
+        tags = py_.get(data, "tags", [])
+        overview = py_.get(data, "overview")
+        team_members = py_.get(data, "team_members")
+        content = py_.get(data, "content")
+        # initialize the project
+        project_id = ObjectId()
+        project_obj = {
+            "_id": project_id,
+            "author_id": ObjectId(user_id),
+            "title": title,
+            "main_tag": main_tag,
+            "tags": tags,
+            "overview": overview,
+            "thumbnail": None,
+            "stage": Enums.ProjectStage.UNPUBLISHED.value,
+            "stage_detail": {},
+            "team_members": team_members,
+            "content": content,
+            "updates": []
+        }
+        Repo.mProjects.insert(project_obj)
+        return {"_id": str(project_id)}

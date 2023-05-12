@@ -14,7 +14,7 @@ api = ApiMeta.api
 api.add_namespace(AuthApi, path='/auth')
 api.add_namespace(ProjectsApi, path='/projects')
 api.add_namespace(UserApi, path='/user')
-api.add_namespace(FormApi, path='/form')
+api.add_namespace(FormApi, path='/forms')
 
 
 DEFAULT_BLUEPRINTS = [

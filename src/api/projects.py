@@ -47,4 +47,22 @@ class Mail(Resource):
         return ResponseMsg.SUCCESS.to_json(data={"project": project})
 
 
+@ api.route('/initialize')
+@ api.doc(responses=ProjectsMeta.RESPONSE_CODE)
+class Mail(Resource):
+
+    @api.expect(ProjectsMeta.in_initialize)
+    @api.marshal_with(ProjectsMeta.response)
+    @Decorators.req_login
+    @enable_cors
+    def post(self, user_id):
+        """
+            Initialize a project
+        """
+        data = marshal(request.get_json(), ProjectsMeta.in_initialize)
+        result = Controllers.Projects.init_project(user_id, data)
+        if not result:
+            return ResponseMsg.INVALID.to_json(), 400
+        return ResponseMsg.SUCCESS.to_json(data=result)
+
 # TODO: edit form
