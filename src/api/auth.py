@@ -33,7 +33,27 @@ class Login(Resource):
         public_key = py_.get(data, "public_key")
         timestamp = py_.get(data, 'timestamp')
         address = py_.get(data, 'address')
-        resp = Controllers.Auth.authenticate_wallet_server_side(signature, public_key, timestamp, address)
+        resp = Controllers.Auth.authenticate_wallet_server_side(
+            signature, public_key, timestamp, address)
+        if not resp:
+            return ResponseMsg.INVALID.to_json(data={}), 400
+        return ResponseMsg.SUCCESS.to_json(data=resp), 200
+
+
+@api.route('/admin-login')
+@api.doc(responses=AuthMeta.RESPONSE_CODE)
+class Login(Resource):
+    """
+        Login Admin Resource
+    """
+    @api.expect(AuthMeta.in_admin_login)
+    @api.marshal_with(AuthMeta.resp_admin_login)
+    @enable_cors
+    def post(self):
+        data = marshal(request.get_json(), AuthMeta.in_admin_login)
+        username = py_.get(data, "username")
+        password = py_.get(data, "password")
+        resp = Controllers.Auth.auth_admin(username, password)
         if not resp:
             return ResponseMsg.INVALID.to_json(data={}), 400
         return ResponseMsg.SUCCESS.to_json(data=resp), 200
@@ -52,7 +72,8 @@ class RefreshToken(Resource):
         refresh_token = py_.get(data, "refresh_token")
         if not refresh_token:
             return ResponseMsg.INVALID.to_json(data={}), 400
-        new_access_token, new_refresh_token = Controllers.Auth.refresh_token(refresh_token)
+        new_access_token, new_refresh_token = Controllers.Auth.refresh_token(
+            refresh_token)
 
         return ResponseMsg.SUCCESS.to_json(data={
             "access_token": new_access_token,

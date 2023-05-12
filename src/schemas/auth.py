@@ -23,6 +23,11 @@ class Meta(BaseMeta):
         'address': fields.String(description='Address', required=True)
     })
 
+    in_admin_login = api.model('InputAdminLogin', {
+        'username': fields.String(description='Username', required=True),
+        "password": fields.String(description='Password', required=True)
+    })
+
     out_login = api.model('OutputLogin', {
         'access_token': fields.String(default=""),
         'refresh_token': fields.String(default=""),
@@ -32,6 +37,16 @@ class Meta(BaseMeta):
 
     resp_login = api.inherit("LoginResponse", response, {
         'data': fields.Nested(out_login, default={})
+    })
+
+    out_admin_login = api.model('OutputAdminLogin', {
+        'access_token': fields.String(default=""),
+        'refresh_token': fields.String(default=""),
+        'server_time': fields.Integer(),
+    })
+
+    resp_admin_login = api.inherit("LoginAdminResponse", response, {
+        'data': fields.Nested(out_admin_login, default={})
     })
 
     access_token = api.model('AccessToken', {

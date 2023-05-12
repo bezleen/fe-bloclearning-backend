@@ -21,7 +21,8 @@ class Authentication(object):
     @classmethod
     def authenticate_wallet_server_side(cls, signature, public_key, timestamp, address):
         server_time = tzware_datetime()
-        custom_id = cls.verify_signature(signature, public_key, timestamp, address)
+        custom_id = cls.verify_signature(
+            signature, public_key, timestamp, address)
         if not custom_id:
             return
         custom_id_hash = funcs.ora_hash(custom_id)
@@ -31,8 +32,10 @@ class Authentication(object):
             user_id = ObjectId()
             name = names.get_first_name()
             name_idx = funcs.safe_string(name)
-            access_token = cls.generate_access_token(str(user_id), Enums.UserRole.DAO_MEMBER.value, is_refresh_token=False)
-            refresh_token = cls.generate_access_token(str(user_id), Enums.UserRole.DAO_MEMBER.value, is_refresh_token=True)
+            access_token = cls.generate_access_token(
+                str(user_id), Enums.UserRole.DAO_MEMBER.value, is_refresh_token=False)
+            refresh_token = cls.generate_access_token(
+                str(user_id), Enums.UserRole.DAO_MEMBER.value, is_refresh_token=True)
             avatar = random.choice(Enums.Avatar.list())
             Repo.mUser.insert({
                 "_id": user_id,
@@ -52,8 +55,10 @@ class Authentication(object):
 
             user_id = py_.get(user_obj, '_id')
             user_role = py_.get(user_obj, "read_only.role")
-            access_token = cls.generate_access_token(str(user_id), user_role, is_refresh_token=False)
-            refresh_token = cls.generate_access_token(str(user_id), user_role, is_refresh_token=True)
+            access_token = cls.generate_access_token(
+                str(user_id), user_role, is_refresh_token=False)
+            refresh_token = cls.generate_access_token(
+                str(user_id), user_role, is_refresh_token=True)
             Repo.mUser.update_raw(
                 {"_id": user_id},
                 {
@@ -85,7 +90,8 @@ class Authentication(object):
         is_access_token = 1
 
         if is_refresh_token:
-            exp_at = dt.timedelta(seconds=Consts.REFRESH_TOKEN_TTL) + server_time
+            exp_at = dt.timedelta(
+                seconds=Consts.REFRESH_TOKEN_TTL) + server_time
             exp_at_ts = int(exp_at.timestamp())
             is_access_token = 0
 
@@ -93,7 +99,7 @@ class Authentication(object):
             "iss": 'ora-sci',
             "exp": exp_at_ts,
             "iat": tzware_timestamp(),
-            "app_id": "coup",
+            "app_id": "ora_sci",
             "_id": user_id,
             "role": role,
             "access_token": is_access_token
@@ -109,7 +115,8 @@ class Authentication(object):
     @ classmethod
     def decode_jwt(self, token, options={}):
         try:
-            payload = jwt.decode(token, Conf.SECRET_KEY, ["HS256"], options=options)
+            payload = jwt.decode(token, Conf.SECRET_KEY, [
+                                 "HS256"], options=options)
             return payload
         except:
             traceback.print_exc()
@@ -139,8 +146,10 @@ class Authentication(object):
         if not user_obj:
             return None, None
         user_role = py_.get(user_obj, "read_only.role")
-        new_access_token = cls.generate_access_token(str(uid), user_role, is_refresh_token=False)
-        new_refresh_token = cls.generate_access_token(str(uid), user_role, is_refresh_token=True)
+        new_access_token = cls.generate_access_token(
+            str(uid), user_role, is_refresh_token=False)
+        new_refresh_token = cls.generate_access_token(
+            str(uid), user_role, is_refresh_token=True)
         Repo.mUser.update_raw(
             {"_id": ObjectId(uid)},
             {
@@ -151,3 +160,21 @@ class Authentication(object):
             }
         )
         return new_access_token, new_refresh_token
+
+    @classmethod
+    def auth_admin(cls, username, password):
+        if username != Consts.ADMIN_USERNAME:
+            return
+        if password != Consts.ADMIN_PASSWORD:
+            return
+        access_token = cls.generate_access_token(
+            Enums.UserRole.ADMIN.value, Enums.UserRole.ADMIN.value, is_refresh_token=False)
+        refresh_token = cls.generate_access_token(
+            Enums.UserRole.ADMIN.value, Enums.UserRole.ADMIN.value, is_refresh_token=True)
+        server_time = tzware_datetime()
+        response = {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "server_time": int(server_time.timestamp())
+        }
+        return response
