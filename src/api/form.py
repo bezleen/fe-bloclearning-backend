@@ -22,14 +22,14 @@ api = FormMeta.api
 @api.doc(responses=FormMeta.RESPONSE_CODE)
 class User(Resource):
 
-    @api.expect(FormMeta.in_offer_reviewer)
+    @api.expect(FormMeta.in_offer_form)
     @Decorators.req_login
     @enable_cors
     def post(self, form_type, user_id):
         """
             Submit a form to become Third Party
         """
-        data = marshal(request.get_json(), FormMeta.in_offer_reviewer)
+        data = marshal(request.get_json(), FormMeta.in_offer_form)
         form_obj = Controllers.Form.submit_form(user_id, form_type, data)
         if not form_obj:
             return ResponseMsg.INVALID.to_json(data={}), 400
