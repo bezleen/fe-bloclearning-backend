@@ -36,6 +36,24 @@ class User(Resource):
         return ResponseMsg.SUCCESS.to_json(data=form_obj), 200
 
 
+@api.route('/offer-reviewer')
+@api.doc(responses=FormMeta.RESPONSE_CODE)
+class User(Resource):
+
+    @api.expect(FormMeta.in_offer_reviewer)
+    @Decorators.req_login
+    @enable_cors
+    def post(self, user_id):
+        """
+            Submit a form to become Third Party
+        """
+        data = marshal(request.get_json(), FormMeta.in_offer_reviewer)
+        form_obj = Controllers.Form.submit_form_reviewer(user_id, data)
+        if not form_obj:
+            return ResponseMsg.INVALID.to_json(data={}), 400
+        return ResponseMsg.SUCCESS.to_json(data=form_obj), 200
+
+
 @api.route('/offer-third_party')
 @api.doc(responses=FormMeta.RESPONSE_CODE)
 class User(Resource):

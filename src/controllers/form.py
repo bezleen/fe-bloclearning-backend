@@ -71,6 +71,45 @@ class Form(object):
         return {"form_id": str(_id)}
 
     @classmethod
+    def submit_form_reviewer(cls, user_id, data):
+        form_info = Repo.mForms.get_item_with(
+            {
+                "candidate_id": ObjectId(user_id),
+                "status": {"$in": [Enums.FormStatus.UNPUBLISHED.value, Enums.FormStatus.PENDING.value]}
+            })
+        if form_info:
+            return
+        candidate_info = Controllers.User.get_profile(user_id)
+        current_role = py_.get(candidate_info, "role")
+        if py_.get(current_role, Enums.UserRole.REVIEWER.value, 0) == 1:
+            return
+        candidate_name = py_.get(data, "name")
+        occupation = py_.get(data, 'occupation')
+        work_at = py_.get(data, 'work_at')
+        location = py_.get(data, 'location')
+        contact = py_.get(data, 'contact')
+        # TODO: config the custom data
+        custom_data = {}
+        _id = ObjectId()
+        obj = {
+            "_id": _id,
+            "type": Enums.FormType.OFFER_REVIEWER.value,
+            "candidate_id": ObjectId(user_id),
+            "card_id_front": None,
+            "card_id_back": None,
+            "attached_file_path": None,
+            "candidate_name": candidate_name,
+            "occupation": occupation,
+            "work_at": work_at,
+            "location": location,
+            "contact": contact,
+            "custom_data": custom_data,
+            "status": Enums.FormStatus.UNPUBLISHED.value
+        }
+        Repo.mForms.insert(obj)
+        return {"form_id": str(_id)}
+
+    @classmethod
     def submit_form_third_party(cls, user_id, data):
         form_info = Repo.mForms.get_item_with(
             {

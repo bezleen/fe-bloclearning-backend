@@ -19,6 +19,7 @@ class Example(EnumBase):
 class UserRole(EnumBase):
     DAO_MEMBER = "dao_member"
     RESEARCHER = "researcher"
+    REVIEWER = "reviewer"
     THIRD_PARTY = "third_party"
     ADMIN = "admin"
 
@@ -32,6 +33,7 @@ class Avatar(EnumBase):
 
 class FormType(EnumBase):
     OFFER_RESEARCHER = "offer_researcher"
+    OFFER_REVIEWER = "offer_reviewer"
     OFFER_THIRD_PARTY = "offer_third_party"
 
 

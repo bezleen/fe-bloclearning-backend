@@ -20,10 +20,12 @@ KEY_USER_TOKEN = f"{PREFIX_KEY}:user:session:"
 DEFAULT_ROLE_OBJ = {
     Enums.UserRole.DAO_MEMBER.value: 1,
     Enums.UserRole.RESEARCHER.value: 0,
+    Enums.UserRole.REVIEWER.value: 0,
     Enums.UserRole.THIRD_PARTY.value: 0,
 }
 
 FORM_TO_ROLE = {
     Enums.FormType.OFFER_RESEARCHER.value: Enums.UserRole.RESEARCHER.value,
+    Enums.FormType.OFFER_REVIEWER.value: Enums.UserRole.REVIEWER.value,
     Enums.FormType.OFFER_THIRD_PARTY.value: Enums.UserRole.THIRD_PARTY.value
 }

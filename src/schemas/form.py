@@ -19,6 +19,14 @@ class Meta(BaseMeta):
         'location': fields.String(description='location', required=True),
         'contact': fields.String(description='contact', required=True)
     })
+    in_offer_reviewer = api.model('InputBecomeResearcher', {
+        'name': fields.String(description='name', required=True),
+        'occupation': fields.String(description='occupation', required=True),
+        'work_at': fields.String(description='work_at', required=True),
+        'location': fields.String(description='location', required=True),
+        'contact': fields.String(description='contact', required=True)
+    })
+
     in_offer_third_party = api.model('InputBecomeResearcher', {
         'name': fields.String(description='name', required=True),
         'occupation': fields.String(description='occupation', required=True),
