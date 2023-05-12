@@ -177,7 +177,7 @@ class Authentication(object):
     @classmethod
     def sync_token(cls, user_id, access_token):
         # sync to redis
-        _key = Consts.KEY_USER_TOKEN + user_id
+        _key = Consts.KEY_USER_TOKEN + str(user_id)
         redis_cached.set(_key, access_token, 86400)
         if user_id == Enums.UserRole.ADMIN.value:
             return
