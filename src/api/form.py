@@ -18,55 +18,19 @@ from src.middlewares.http import enable_cors
 api = FormMeta.api
 
 
-@api.route('/offer-researcher')
-@api.doc(responses=FormMeta.RESPONSE_CODE)
-class User(Resource):
-
-    @api.expect(FormMeta.in_offer_researcher)
-    @Decorators.req_login
-    @enable_cors
-    def post(self, user_id):
-        """
-            Submit a form to become Researcher
-        """
-        data = marshal(request.get_json(), FormMeta.in_offer_researcher)
-        form_obj = Controllers.Form.submit_form_researcher(user_id, data)
-        if not form_obj:
-            return ResponseMsg.INVALID.to_json(data={}), 400
-        return ResponseMsg.SUCCESS.to_json(data=form_obj), 200
-
-
-@api.route('/offer-reviewer')
+@api.route('/offer/<form_type>')
 @api.doc(responses=FormMeta.RESPONSE_CODE)
 class User(Resource):
 
     @api.expect(FormMeta.in_offer_reviewer)
     @Decorators.req_login
     @enable_cors
-    def post(self, user_id):
+    def post(self, form_type, user_id):
         """
             Submit a form to become Third Party
         """
         data = marshal(request.get_json(), FormMeta.in_offer_reviewer)
-        form_obj = Controllers.Form.submit_form_reviewer(user_id, data)
-        if not form_obj:
-            return ResponseMsg.INVALID.to_json(data={}), 400
-        return ResponseMsg.SUCCESS.to_json(data=form_obj), 200
-
-
-@api.route('/offer-third_party')
-@api.doc(responses=FormMeta.RESPONSE_CODE)
-class User(Resource):
-
-    @api.expect(FormMeta.in_offer_third_party)
-    @Decorators.req_login
-    @enable_cors
-    def post(self, user_id):
-        """
-            Submit a form to become Third Party
-        """
-        data = marshal(request.get_json(), FormMeta.in_offer_researcher)
-        form_obj = Controllers.Form.submit_form_third_party(user_id, data)
+        form_obj = Controllers.Form.submit_form(user_id, form_type, data)
         if not form_obj:
             return ResponseMsg.INVALID.to_json(data={}), 400
         return ResponseMsg.SUCCESS.to_json(data=form_obj), 200
@@ -212,5 +176,5 @@ class User(Resource):
         """
             Get my form by id
         """
-        form = Controllers.Form.get_form_by_id(user_id, form_id)
+        form = Controllers.Form.get_my_form_by_id(user_id, form_id)
         return ResponseMsg.SUCCESS.to_json(data=form), 200

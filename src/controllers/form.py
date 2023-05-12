@@ -18,7 +18,7 @@ from bson import json_util
 
 class Form(object):
     CARD_ID_FILE_ALLOW = ['png', 'jpg', 'jpeg', 'webp']
-    ATTACHED_FILE_ALLOW = ["pdf"]
+    ATTACHED_FILE_ALLOW = ["zip"]
 
     @classmethod
     def check_allowed_file(cls, file_name, allow_file=[]):
@@ -32,7 +32,7 @@ class Form(object):
         return
 
     @classmethod
-    def submit_form_researcher(cls, user_id, data):
+    def submit_form(cls, user_id, form_type, data):
         form_info = Repo.mForms.get_item_with(
             {
                 "candidate_id": ObjectId(user_id),
@@ -42,8 +42,11 @@ class Form(object):
             return
         candidate_info = Controllers.User.get_profile(user_id)
         current_role = py_.get(candidate_info, "role")
-        if py_.get(current_role, Enums.UserRole.RESEARCHER.value, 0) == 1:
+        if py_.get(current_role, Consts.FORM_TO_ROLE[form_type], 0) == 1:
             return
+        candidate_type = py_.get(data, "candidate_type")
+        field = py_.get(data, "field"),
+        email = py_.get(data, "email")
         candidate_name = py_.get(data, "name")
         occupation = py_.get(data, 'occupation')
         work_at = py_.get(data, 'work_at')
@@ -54,7 +57,7 @@ class Form(object):
         _id = ObjectId()
         obj = {
             "_id": _id,
-            "type": Enums.FormType.OFFER_RESEARCHER.value,
+            "type": form_type,
             "candidate_id": ObjectId(user_id),
             "card_id_front": None,
             "card_id_back": None,
@@ -64,84 +67,9 @@ class Form(object):
             "work_at": work_at,
             "location": location,
             "contact": contact,
-            "custom_data": custom_data,
-            "status": Enums.FormStatus.UNPUBLISHED.value
-        }
-        Repo.mForms.insert(obj)
-        return {"form_id": str(_id)}
-
-    @classmethod
-    def submit_form_reviewer(cls, user_id, data):
-        form_info = Repo.mForms.get_item_with(
-            {
-                "candidate_id": ObjectId(user_id),
-                "status": {"$in": [Enums.FormStatus.UNPUBLISHED.value, Enums.FormStatus.PENDING.value]}
-            })
-        if form_info:
-            return
-        candidate_info = Controllers.User.get_profile(user_id)
-        current_role = py_.get(candidate_info, "role")
-        if py_.get(current_role, Enums.UserRole.REVIEWER.value, 0) == 1:
-            return
-        candidate_name = py_.get(data, "name")
-        occupation = py_.get(data, 'occupation')
-        work_at = py_.get(data, 'work_at')
-        location = py_.get(data, 'location')
-        contact = py_.get(data, 'contact')
-        # TODO: config the custom data
-        custom_data = {}
-        _id = ObjectId()
-        obj = {
-            "_id": _id,
-            "type": Enums.FormType.OFFER_REVIEWER.value,
-            "candidate_id": ObjectId(user_id),
-            "card_id_front": None,
-            "card_id_back": None,
-            "attached_file_path": None,
-            "candidate_name": candidate_name,
-            "occupation": occupation,
-            "work_at": work_at,
-            "location": location,
-            "contact": contact,
-            "custom_data": custom_data,
-            "status": Enums.FormStatus.UNPUBLISHED.value
-        }
-        Repo.mForms.insert(obj)
-        return {"form_id": str(_id)}
-
-    @classmethod
-    def submit_form_third_party(cls, user_id, data):
-        form_info = Repo.mForms.get_item_with(
-            {
-                "candidate_id": ObjectId(user_id),
-                "status": {"$in": [Enums.FormStatus.UNPUBLISHED.value, Enums.FormStatus.PENDING.value]}
-            })
-        if form_info:
-            return
-        candidate_info = Controllers.User.get_profile(user_id)
-        current_role = py_.get(candidate_info, "role")
-        if py_.get(current_role, Enums.UserRole.THIRD_PARTY.value, 0) == 1:
-            return
-        candidate_name = py_.get(data, "name")
-        occupation = py_.get(data, 'occupation')
-        work_at = py_.get(data, 'work_at')
-        location = py_.get(data, 'location')
-        contact = py_.get(data, 'contact')
-        # TODO: config the custom data
-        custom_data = {}
-        _id = ObjectId()
-        obj = {
-            "_id": _id,
-            "type": Enums.FormType.OFFER_THIRD_PARTY.value,
-            "candidate_id": ObjectId(user_id),
-            "card_id_front": None,
-            "card_id_back": None,
-            "attached_file_path": None,
-            "candidate_name": candidate_name,
-            "occupation": occupation,
-            "work_at": work_at,
-            "location": location,
-            "contact": contact,
+            "candidate_type": candidate_type,
+            "field": field,
+            "email": email,
             "custom_data": custom_data,
             "status": Enums.FormStatus.UNPUBLISHED.value
         }
@@ -272,6 +200,9 @@ class Form(object):
         attached_file_path = py_.get(form_info, "attached_file_path")
         custom_data = py_.get(form_info, "custom_data", {})
         # form data
+        candidate_type = py_.get(form_info, "candidate_type")
+        field = py_.get(form_info, "field"),
+        email = py_.get(form_info, "email")
         candidate_name = py_.get(form_info, "name")
         occupation = py_.get(form_info, 'occupation')
         work_at = py_.get(form_info, 'work_at')
@@ -298,6 +229,9 @@ class Form(object):
             "work_at": work_at,
             "location": location,
             "contact": contact,
+            "candidate_type": candidate_type,
+            "field": field,
+            "email": email,
             "first_login": first_login,
             "last_login": last_login,
             "status": form_status
@@ -378,7 +312,7 @@ class Form(object):
         return resp_forms
 
     @classmethod
-    def get_form_by_id(cls, user_id, form_id):
+    def get_my_form_by_id(cls, user_id, form_id):
         form_info = Repo.mForms.get_item_with({"_id": ObjectId(form_id)})
         if not form_info:
             return {}
@@ -393,6 +327,9 @@ class Form(object):
         attached_file_path = py_.get(form_info, "attached_file_path")
         custom_data = py_.get(form_info, "custom_data", {})
         # form data
+        candidate_type = py_.get(form_info, "candidate_type")
+        field = py_.get(form_info, "field"),
+        email = py_.get(form_info, "email")
         candidate_name = py_.get(form_info, "name")
         occupation = py_.get(form_info, 'occupation')
         work_at = py_.get(form_info, 'work_at')
@@ -420,6 +357,9 @@ class Form(object):
             "work_at": work_at,
             "location": location,
             "contact": contact,
+            "candidate_type": candidate_type,
+            "field": field,
+            "email": email,
             "first_login": first_login,
             "last_login": last_login,
             "status": form_status

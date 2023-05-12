@@ -70,3 +70,8 @@ class CompleteStatus(EnumBase):
     CLAIMABLE = "claimable"
     UNCLAIMABLE = "unclaimable"
     PENDING = "pending"
+
+
+class FormCandidateType(EnumBase):
+    ORGANIZATION = "organization",
+    PERSONAL = "personal",
