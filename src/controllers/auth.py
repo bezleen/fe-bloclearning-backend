@@ -14,6 +14,7 @@ import src.enums as Enums
 import src.constants as Consts
 from src.config import DefaultConfig as Conf
 from src.utils.util_datetime import tzware_datetime, tzware_timestamp
+from src.extensions import redis_cached
 
 
 class Authentication(object):
@@ -33,9 +34,9 @@ class Authentication(object):
             name = names.get_first_name()
             name_idx = funcs.safe_string(name)
             access_token = cls.generate_access_token(
-                str(user_id), Enums.UserRole.DAO_MEMBER.value, is_refresh_token=False)
+                str(user_id), Consts.DEFAULT_ROLE_OBJ, is_refresh_token=False)
             refresh_token = cls.generate_access_token(
-                str(user_id), Enums.UserRole.DAO_MEMBER.value, is_refresh_token=True)
+                str(user_id), Consts.DEFAULT_ROLE_OBJ, is_refresh_token=True)
             avatar = random.choice(Enums.Avatar.list())
             Repo.mUser.insert({
                 "_id": user_id,
@@ -47,10 +48,11 @@ class Authentication(object):
                 },
                 "read_only": {
                     "name": name,
-                    "role": Enums.UserRole.DAO_MEMBER.value,
+                    "role": Consts.DEFAULT_ROLE_OBJ,
                     "avatar": avatar
                 }
             })
+            cls.sync_token(user_id, access_token)
         else:
 
             user_id = py_.get(user_obj, '_id')
@@ -59,15 +61,7 @@ class Authentication(object):
                 str(user_id), user_role, is_refresh_token=False)
             refresh_token = cls.generate_access_token(
                 str(user_id), user_role, is_refresh_token=True)
-            Repo.mUser.update_raw(
-                {"_id": user_id},
-                {
-                    "$set": {
-                        "internal.last_access_token": access_token,
-                        "last_login": int(server_time.timestamp())
-                    }
-                }
-            )
+            cls.sync_token(user_id, access_token)
 
         user_id = py_.to_string(user_id)
         response = {
@@ -94,7 +88,8 @@ class Authentication(object):
                 seconds=Consts.REFRESH_TOKEN_TTL) + server_time
             exp_at_ts = int(exp_at.timestamp())
             is_access_token = 0
-
+        if user_id != Enums.UserRole.ADMIN.value:
+            role = cls.encode_user_role(role)
         payload_jwt = {
             "iss": 'ora-sci',
             "exp": exp_at_ts,
@@ -178,3 +173,51 @@ class Authentication(object):
             "server_time": int(server_time.timestamp())
         }
         return response
+
+    @classmethod
+    def sync_token(cls, user_id, access_token):
+        # sync to redis
+        _key = Consts.KEY_USER_TOKEN + user_id
+        redis_cached.set(_key, access_token, 86400)
+        if user_id == Enums.UserRole.ADMIN.value:
+            return
+        # sync to database
+        Repo.mUser.update_raw({
+            "_id": ObjectId(user_id)
+        },
+            {
+            "$set": {
+                "internal.last_access_token": access_token,
+                "last_login": tzware_timestamp()
+            }
+        })
+        return
+
+    @classmethod
+    def encode_user_role(cls, role_obj: dict):
+        if not role_obj:
+            return ""
+        encoded = ""
+        for role, status in role_obj.items():
+            if status == 0:
+                continue
+            encoded += f"/{role}"
+        encoded = encoded[1:] if len(encoded) > 0 else encoded
+        return encoded
+
+    @classmethod
+    def decode_user_role(cls, role_encoded, output_type="dict"):
+        list_role = role_encoded.split("/")
+        if output_type == "list":
+            return list_role
+
+        if output_type == "dict":
+            dict_resp = {}
+            for default_role in Enums.UserRole.list():
+                if default_role == Enums.UserRole.ADMIN.value():
+                    continue
+                dict_resp.update(
+                    {
+                        default_role: int(default_role in list_role)
+                    })
+            return dict_resp

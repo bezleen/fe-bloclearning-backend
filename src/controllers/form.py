@@ -42,9 +42,14 @@ class Form(object):
             return
         candidate_info = Controllers.User.get_profile(user_id)
         current_role = py_.get(candidate_info, "role")
-        if current_role in [Enums.UserRole.RESEARCHER.value, Enums.UserRole.ADMIN.value]:
+        if py_.get(current_role, Enums.UserRole.RESEARCHER.value, 0) == 1:
             return
-        # TODO: parse the value from data
+        candidate_name = py_.get(data, "name")
+        occupation = py_.get(data, 'occupation')
+        work_at = py_.get(data, 'work_at')
+        location = py_.get(data, 'location')
+        contact = py_.get(data, 'contact')
+        # TODO: config the custom data
         custom_data = {}
         _id = ObjectId()
         obj = {
@@ -54,6 +59,11 @@ class Form(object):
             "card_id_front": None,
             "card_id_back": None,
             "attached_file_path": None,
+            "candidate_name": candidate_name,
+            "occupation": occupation,
+            "work_at": work_at,
+            "location": location,
+            "contact": contact,
             "custom_data": custom_data,
             "status": Enums.FormStatus.UNPUBLISHED.value
         }
@@ -71,9 +81,14 @@ class Form(object):
             return
         candidate_info = Controllers.User.get_profile(user_id)
         current_role = py_.get(candidate_info, "role")
-        if current_role == Enums.FormType.OFFER_THIRD_PARTY.value:
+        if py_.get(current_role, Enums.UserRole.THIRD_PARTY.value, 0) == 1:
             return
-        # TODO: parse the value from data
+        candidate_name = py_.get(data, "name")
+        occupation = py_.get(data, 'occupation')
+        work_at = py_.get(data, 'work_at')
+        location = py_.get(data, 'location')
+        contact = py_.get(data, 'contact')
+        # TODO: config the custom data
         custom_data = {}
         _id = ObjectId()
         obj = {
@@ -83,11 +98,16 @@ class Form(object):
             "card_id_front": None,
             "card_id_back": None,
             "attached_file_path": None,
+            "candidate_name": candidate_name,
+            "occupation": occupation,
+            "work_at": work_at,
+            "location": location,
+            "contact": contact,
             "custom_data": custom_data,
             "status": Enums.FormStatus.UNPUBLISHED.value
         }
         Repo.mForms.insert(obj)
-        return {"form_id": _id}
+        return {"form_id": str(_id)}
 
     @classmethod
     def upload_card_id_img(cls, user_id, form_id, file, side):
@@ -184,8 +204,8 @@ class Form(object):
             form_type = py_.get(form, "type")
             form_status = py_.get(form, "status")
             candidate_id = py_.get(form, "candidate_id")
+            candidate_name = py_.get(form, "name")
             candidate_info = Controllers.User.get_profile(candidate_id)
-            candidate_name = py_.get(candidate_info, "name")
             current_role = py_.get(candidate_info, "role")
             avatar = py_.get(candidate_info, "avatar")
             resp_forms.append({
@@ -211,15 +231,17 @@ class Form(object):
         card_id_front = py_.get(form_info, "card_id_front")
         card_id_back = py_.get(form_info, "card_id_back")
         attached_file_path = py_.get(form_info, "attached_file_path")
-        custom_data = py_.get(form_info, "custom_data")
+        custom_data = py_.get(form_info, "custom_data", {})
+        # form data
+        candidate_name = py_.get(form_info, "name")
+        occupation = py_.get(form_info, 'occupation')
+        work_at = py_.get(form_info, 'work_at')
+        location = py_.get(form_info, 'location')
+        contact = py_.get(form_info, 'contact')
+        # account data
         candidate_info = Controllers.User.get_profile(candidate_id)
-        candidate_name = py_.get(candidate_info, "name")
         current_role = py_.get(candidate_info, "role")
         avatar = py_.get(candidate_info, "avatar")
-        occupation = py_.get(candidate_info, 'occupation')
-        work_at = py_.get(candidate_info, 'work_at')
-        location = py_.get(candidate_info, 'location')
-        contact = py_.get(candidate_info, 'contact')
         last_login = py_.get(candidate_info, "last_login")
         first_login = py_.get(candidate_info, "first_login")
         resp = {
@@ -257,7 +279,7 @@ class Form(object):
             },
             {
                 "$set": {
-                    "read_only.role": form_type
+                    f"read_only.role.{Consts.FORM_TO_ROLE[form_type]}": 1
                 }
             })
         Repo.mForms.update_raw(
@@ -300,6 +322,7 @@ class Form(object):
             form_type = py_.get(form, "type")
             form_status = py_.get(form, "status")
             candidate_id = py_.get(form, "candidate_id")
+            candidate_name = py_.get(form, "name")
             candidate_info = Controllers.User.get_profile(candidate_id)
             candidate_name = py_.get(candidate_info, "name")
             current_role = py_.get(candidate_info, "role")
@@ -329,17 +352,20 @@ class Form(object):
         card_id_front = py_.get(form_info, "card_id_front")
         card_id_back = py_.get(form_info, "card_id_back")
         attached_file_path = py_.get(form_info, "attached_file_path")
-        custom_data = py_.get(form_info, "custom_data")
+        custom_data = py_.get(form_info, "custom_data", {})
+        # form data
+        candidate_name = py_.get(form_info, "name")
+        occupation = py_.get(form_info, 'occupation')
+        work_at = py_.get(form_info, 'work_at')
+        location = py_.get(form_info, 'location')
+        contact = py_.get(form_info, 'contact')
+        # account data
         candidate_info = Controllers.User.get_profile(candidate_id)
-        candidate_name = py_.get(candidate_info, "name")
         current_role = py_.get(candidate_info, "role")
         avatar = py_.get(candidate_info, "avatar")
-        occupation = py_.get(candidate_info, 'occupation')
-        work_at = py_.get(candidate_info, 'work_at')
-        location = py_.get(candidate_info, 'location')
-        contact = py_.get(candidate_info, 'contact')
         last_login = py_.get(candidate_info, "last_login")
         first_login = py_.get(candidate_info, "first_login")
+
         resp = {
             "_id": str(form_id),
             "type": form_type,

@@ -115,7 +115,7 @@ class User(Resource):
 
     @Decorators.req_admin
     @enable_cors
-    def get(self, user_id):
+    def get(self):
         """
             Admin Fetch Forms
         """
@@ -132,7 +132,7 @@ class User(Resource):
 
     @Decorators.req_admin
     @enable_cors
-    def get(self, form_id, user_id):
+    def get(self, form_id):
         """
             Admin Get Form Detail
         """
@@ -146,7 +146,7 @@ class User(Resource):
 
     @Decorators.req_admin
     @enable_cors
-    def get(self, form_id, user_id):
+    def get(self, form_id):
         """
             Admin Approve Form
         """
@@ -160,7 +160,7 @@ class User(Resource):
 
     @Decorators.req_admin
     @enable_cors
-    def get(self, form_id, user_id):
+    def get(self, form_id):
         """
             Admin Reject Form
         """

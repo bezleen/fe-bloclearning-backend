@@ -66,14 +66,22 @@ def req_login(f):
 
         token_info = Controllers.Auth.decode_jwt(access_token)
         user_id = py_.get(token_info, "_id")
+        user_role = py_.get(token_info, "role")
 
         if not user_id:
             return ResponseMsg.UNAUTHORIZED.to_json(), 401
 
         # check conflict
-        is_conflict = Controllers.User.check_conflict_token(user_id, access_token)
+        is_conflict = Controllers.User.check_conflict_token(
+            user_id, access_token)
         if is_conflict:
             return ResponseMsg.LOGIN_CONFLICT.to_json(), 409
+
+        # prevent admin
+        role_decoded = Controllers.Auth.decode_user_role(
+            user_role, output_type="list")
+        if Enums.UserRole.ADMIN.value in role_decoded:
+            return ResponseMsg.UNAUTHORIZED.to_json(), 401
 
         return f(user_id=user_id, *args, **kwargs)
     return wrapper
@@ -87,16 +95,10 @@ def req_admin(f):
             return ResponseMsg.UNAUTHORIZED.to_json(), 401
 
         token_info = Controllers.Auth.decode_jwt(access_token)
-        user_id = py_.get(token_info, "_id")
         user_role = py_.get(token_info, "role")
 
-        if not user_id or user_role != Enums.UserRole.ADMIN.value:
+        if user_role != Enums.UserRole.ADMIN.value:
             return ResponseMsg.UNAUTHORIZED.to_json(), 401
 
-        # check conflict
-        is_conflict = Controllers.User.check_conflict_token(user_id, access_token)
-        if is_conflict:
-            return ResponseMsg.LOGIN_CONFLICT.to_json(), 409
-
-        return f(user_id=user_id, *args, **kwargs)
+        return f(*args, **kwargs)
     return wrapper

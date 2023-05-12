@@ -20,8 +20,9 @@ class User(object):
 
     @classmethod
     def check_conflict_token(cls, user_id, access_token):
-
-        return False
+        _key = Consts.KEY_USER_TOKEN + user_id
+        synced_token = redis_cached.get(_key) or ""
+        return synced_token != access_token
 
     @classmethod
     def get_profile(cls, user_id):
@@ -50,7 +51,8 @@ class User(object):
         _update = {}
         if name:
             name = funcs.safe_name(name)
-            _update.update({"read_only.name": name, "name_idx": funcs.safe_string(name)})
+            _update.update(
+                {"read_only.name": name, "name_idx": funcs.safe_string(name)})
         if occupation:
             _update.update({"read_only.occupation": occupation})
         if work_at:
@@ -92,7 +94,8 @@ class User(object):
             raise ValueError("File is not allowed")
         # current avatar path
         user_info = Repo.mUser.get_item_with({"_id": ObjectId(user_id)})
-        current_avatar = py_.get(user_info, "read_only.avatar").split("static/")[-1]
+        current_avatar = py_.get(
+            user_info, "read_only.avatar").split("static/")[-1]
         if current_avatar not in Enums.Avatar.list():
             # delete current_avatar
             cls.delete_old_avatar(current_avatar)

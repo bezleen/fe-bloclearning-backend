@@ -1,5 +1,5 @@
 import os
-
+import src.enums as Enums
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,3 +13,17 @@ UPLOAD_FOLDER = os.path.join(os.path.abspath(
     os.path.dirname(os.path.dirname(__file__))), 'src/static')
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+PREFIX_KEY = "orasci"
+
+KEY_USER_TOKEN = f"{PREFIX_KEY}:user:session:"
+
+DEFAULT_ROLE_OBJ = {
+    Enums.UserRole.DAO_MEMBER.value: 1,
+    Enums.UserRole.RESEARCHER.value: 1,
+    Enums.UserRole.THIRD_PARTY.value: 1,
+}
+
+FORM_TO_ROLE = {
+    Enums.FormType.OFFER_RESEARCHER.value: Enums.UserRole.RESEARCHER.value,
+    Enums.FormType.OFFER_THIRD_PARTY.value: Enums.UserRole.THIRD_PARTY.value
+}
