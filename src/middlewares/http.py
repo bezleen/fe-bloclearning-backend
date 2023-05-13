@@ -69,7 +69,7 @@ def enable_cors(func):
     def wrapper(*args, **kwargs):
 
         data, code, headers = unpack(func(*args, **kwargs))
-        if request.method == 'OPTION':
+        if request.method == 'OPTIONS':
             code = 200
 
         headers['Access-Control-Allow-Origin'] = '*'
