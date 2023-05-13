@@ -172,7 +172,7 @@ class Form(object):
             form_type = py_.get(form, "type")
             form_status = py_.get(form, "status")
             candidate_id = py_.get(form, "candidate_id")
-            candidate_name = py_.get(form, "name")
+            candidate_name = py_.get(form, "candidate_name")
             candidate_info = Controllers.User.get_profile(candidate_id)
             current_role = py_.get(candidate_info, "role")
             avatar = py_.get(candidate_info, "avatar")
@@ -204,7 +204,7 @@ class Form(object):
         candidate_type = py_.get(form_info, "candidate_type")
         field = py_.get(form_info, "field"),
         email = py_.get(form_info, "email")
-        candidate_name = py_.get(form_info, "name")
+        candidate_name = py_.get(form_info, "candidate_name")
         occupation = py_.get(form_info, 'occupation')
         work_at = py_.get(form_info, 'work_at')
         location = py_.get(form_info, 'location')
@@ -297,9 +297,8 @@ class Form(object):
             form_type = py_.get(form, "type")
             form_status = py_.get(form, "status")
             candidate_id = py_.get(form, "candidate_id")
-            candidate_name = py_.get(form, "name")
+            candidate_name = py_.get(form, "candidate_name")
             candidate_info = Controllers.User.get_profile(candidate_id)
-            candidate_name = py_.get(candidate_info, "name")
             current_role = py_.get(candidate_info, "role")
             avatar = py_.get(candidate_info, "avatar")
             resp_forms.append({
@@ -332,7 +331,7 @@ class Form(object):
         candidate_type = py_.get(form_info, "candidate_type")
         field = py_.get(form_info, "field"),
         email = py_.get(form_info, "email")
-        candidate_name = py_.get(form_info, "name")
+        candidate_name = py_.get(form_info, "candidate_name")
         occupation = py_.get(form_info, 'occupation')
         work_at = py_.get(form_info, 'work_at')
         location = py_.get(form_info, 'location')
