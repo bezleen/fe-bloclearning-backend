@@ -19,7 +19,7 @@ api = ProjectsMeta.api
 
 @api.route('')
 @api.doc(responses=ProjectsMeta.RESPONSE_CODE)
-class Mails(Resource):
+class Fetch(Resource):
     """
         Get all projects
     """
@@ -33,9 +33,9 @@ class Mails(Resource):
         return ResponseMsg.SUCCESS.to_json(data={"projects": all_projects})
 
 
-@ api.route('/<project_id>')
-@ api.doc(responses=ProjectsMeta.RESPONSE_CODE)
-class Mail(Resource):
+@api.route('/<project_id>')
+@api.doc(responses=ProjectsMeta.RESPONSE_CODE)
+class GetById(Resource):
     """
         Get project by id
     """
@@ -49,7 +49,7 @@ class Mail(Resource):
 
 @api.route('/initialize')
 @api.doc(responses=ProjectsMeta.RESPONSE_CODE)
-class Mail(Resource):
+class Initialize(Resource):
 
     @api.expect(ProjectsMeta.in_initialize)
     @api.marshal_with(ProjectsMeta.response)
@@ -68,7 +68,7 @@ class Mail(Resource):
 
 @api.route('/upload_thumbnail/<project_id>')
 @api.doc(responses=ProjectsMeta.RESPONSE_CODE)
-class Mail(Resource):
+class Thumbnail(Resource):
 
     @api.marshal_with(ProjectsMeta.response)
     @Decorators.req_login
@@ -83,5 +83,52 @@ class Mail(Resource):
             file = request.files["file"]
             Controllers.Projects.upload_thumbnail(user_id, project_id, file)
         except Exception as e:
+            return ResponseMsg.INVALID.to_json(), 400
+        return ResponseMsg.SUCCESS.to_json(data={}), 200
+
+
+@api.route('/publish/<project_id>')
+@api.doc(responses=ProjectsMeta.RESPONSE_CODE)
+class Publish(Resource):
+
+    @api.marshal_with(ProjectsMeta.response)
+    @Decorators.req_login
+    @enable_cors
+    def post(self, project_id, user_id):
+        """
+            Publish A Project 
+        """
+        Controllers.Projects.user_publish_project(project_id, user_id)
+        return ResponseMsg.SUCCESS.to_json(data={}), 200
+
+
+@api.route('/approve/<project_id>')
+@api.doc(responses=ProjectsMeta.RESPONSE_CODE)
+class Approve(Resource):
+
+    @Decorators.req_admin
+    @enable_cors
+    def post(self, project_id):
+        """
+            Admin Approve A Project 
+        """
+        result = Controllers.Projects.user_publish_project(project_id)
+        if not result:
+            return ResponseMsg.INVALID.to_json(), 400
+        return ResponseMsg.SUCCESS.to_json(data={}), 200
+
+
+@api.route('/reject/<project_id>')
+@api.doc(responses=ProjectsMeta.RESPONSE_CODE)
+class Reject(Resource):
+
+    @Decorators.req_admin
+    @enable_cors
+    def post(self, project_id):
+        """
+            Admin Reject A Project 
+        """
+        result = Controllers.Projects.admin_reject_project(project_id)
+        if not result:
             return ResponseMsg.INVALID.to_json(), 400
         return ResponseMsg.SUCCESS.to_json(data={}), 200

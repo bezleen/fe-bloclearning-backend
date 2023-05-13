@@ -1,19 +1,18 @@
 import os
 import random
 import datetime
+import json
+
 from dateutil.relativedelta import relativedelta
 from bson.objectid import ObjectId
-import pytz
 import pydash as py_
-from operator import itemgetter
 
 import src.enums as Enums
 from src.extensions import redis_cached
 import src.controllers as Controllers
 import src.constants as Consts
 import src.models.repo as Repo
-import json
-from bson import json_util
+from src.utils.util_datetime import tzware_datetime, tzware_timestamp
 
 
 class Projects(object):
@@ -170,3 +169,55 @@ class Projects(object):
             }
         )
         return
+
+    @classmethod
+    def user_publish_project(cls, project_id, user_id):
+        project_info = Repo.mProjects.get_item_with(
+            {"_id": ObjectId(project_id)})
+        if not project_info or py_.to_string(py_.get(project_info, "author_id")) != str(user_id):
+            return False
+        Repo.mProjects.update_raw(
+            {"_id": ObjectId(project_id)},
+            {
+                "$set": {
+                    "stage": Enums.ProjectStage.PENDING.value
+                }
+            }
+        )
+        return True
+
+    @classmethod
+    def admin_approve_project(self, project_id):
+        project_info = Repo.mProjects.get_item_with(
+            {"_id": ObjectId(project_id)})
+        current_stage = py_.get(project_info, "stage")
+        if current_stage != Enums.ProjectStage.PENDING.value:
+            return False
+        initiated_timestamp = tzware_timestamp()
+        Repo.mProjects.update_raw(
+            {"_id": ObjectId(project_id)},
+            {
+                "$set": {
+                    "stage": Enums.ProjectStage.PRE_QUALIFICATION.value,
+                    "stage_detail.pre_qualified.initiated": initiated_timestamp,
+                    "stage_detail.pre_qualified.approval": 0.0,
+                }
+            }
+        )
+
+    @classmethod
+    def admin_reject_project(self, project_id):
+        project_info = Repo.mProjects.get_item_with(
+            {"_id": ObjectId(project_id)})
+        current_stage = py_.get(project_info, "stage")
+        if current_stage != Enums.ProjectStage.PENDING.value:
+            return False
+        Repo.mProjects.update_raw(
+            {"_id": ObjectId(project_id)},
+            {
+                "$set": {
+                    "stage": Enums.ProjectStage.REJECTED.value
+                }
+            }
+        )
+        return True

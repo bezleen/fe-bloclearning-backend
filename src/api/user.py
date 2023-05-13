@@ -20,7 +20,7 @@ api = UserMeta.api
 
 @api.route('/profile')
 @api.doc(responses=UserMeta.RESPONSE_CODE)
-class User(Resource):
+class Profile(Resource):
 
     @api.marshal_with(UserMeta.resp_profile)
     @Decorators.req_login
@@ -45,7 +45,8 @@ class User(Resource):
         new_work_at = py_.get(data, "work_at")
         new_location = py_.get(data, "location")
         new_contact = py_.get(data, "contact")
-        Controllers.User.update_profile(user_id, name=new_name, occupation=new_occupation, work_at=new_work_at, location=new_location, contact=new_contact)
+        Controllers.User.update_profile(user_id, name=new_name, occupation=new_occupation,
+                                        work_at=new_work_at, location=new_location, contact=new_contact)
         return ResponseMsg.SUCCESS.to_json(data={}), 200
 
 

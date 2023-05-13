@@ -42,7 +42,7 @@ class Login(Resource):
 
 @api.route('/admin-login')
 @api.doc(responses=AuthMeta.RESPONSE_CODE)
-class Login(Resource):
+class AdminLogin(Resource):
     """
         Login Admin Resource
     """

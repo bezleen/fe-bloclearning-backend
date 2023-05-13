@@ -19,6 +19,6 @@ class Meta(BaseMeta):
         'occupation': fields.String(description='occupation', required=True),
         'work_at': fields.String(description='work_at', required=True),
         'location': fields.String(description='location', required=True),
-        'contact': fields.String(description='contact', required=True),
+        'contact': fields.String(description='contact', default=""),
         'email': fields.String(description='email', required=True)
     })

@@ -68,11 +68,12 @@ class Form(object):
             "location": location,
             "contact": contact,
             "candidate_type": candidate_type,
-            "field": field,
             "email": email,
             "custom_data": custom_data,
             "status": Enums.FormStatus.UNPUBLISHED.value
         }
+        if candidate_type == Enums.FormCandidateType.ORGANIZATION.value:
+            obj["field"] = field
         Repo.mForms.insert(obj)
         return {"form_id": str(_id)}
 
@@ -230,12 +231,13 @@ class Form(object):
             "location": location,
             "contact": contact,
             "candidate_type": candidate_type,
-            "field": field,
             "email": email,
             "first_login": first_login,
             "last_login": last_login,
             "status": form_status
         }
+        if candidate_type == Enums.FormCandidateType.ORGANIZATION.value:
+            resp["field"] = field
         return resp
 
     @classmethod
@@ -358,10 +360,11 @@ class Form(object):
             "location": location,
             "contact": contact,
             "candidate_type": candidate_type,
-            "field": field,
             "email": email,
             "first_login": first_login,
             "last_login": last_login,
             "status": form_status
         }
+        if candidate_type == Enums.FormCandidateType.ORGANIZATION.value:
+            resp["field"] = field
         return resp

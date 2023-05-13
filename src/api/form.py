@@ -20,7 +20,7 @@ api = FormMeta.api
 
 @api.route('/offer/<form_type>')
 @api.doc(responses=FormMeta.RESPONSE_CODE)
-class User(Resource):
+class Offer(Resource):
 
     @api.expect(FormMeta.in_offer_form)
     @Decorators.req_login
@@ -38,7 +38,7 @@ class User(Resource):
 
 @api.route('/upload-id-card/<side>')
 @api.doc(responses=FormMeta.RESPONSE_CODE)
-class User(Resource):
+class UploadIdCard(Resource):
 
     @Decorators.req_login
     @enable_cors
@@ -59,7 +59,7 @@ class User(Resource):
 
 @api.route('/upload-attached-file/<form_id>')
 @api.doc(responses=FormMeta.RESPONSE_CODE)
-class User(Resource):
+class UploadAttachedFile(Resource):
 
     @Decorators.req_login
     @enable_cors
@@ -79,7 +79,7 @@ class User(Resource):
 
 @api.route('/publish/<form_id>')
 @api.doc(responses=FormMeta.RESPONSE_CODE)
-class User(Resource):
+class Publish(Resource):
 
     @Decorators.req_login
     @enable_cors
@@ -93,7 +93,7 @@ class User(Resource):
 
 @api.route('/')
 @api.doc(responses=FormMeta.RESPONSE_CODE)
-class User(Resource):
+class Fetch(Resource):
 
     @Decorators.req_admin
     @enable_cors
@@ -110,7 +110,7 @@ class User(Resource):
 
 @api.route('/<form_id>')
 @api.doc(responses=FormMeta.RESPONSE_CODE)
-class User(Resource):
+class GetById(Resource):
 
     @Decorators.req_admin
     @enable_cors
@@ -124,7 +124,7 @@ class User(Resource):
 
 @api.route('/approve/<form_id>')
 @api.doc(responses=FormMeta.RESPONSE_CODE)
-class User(Resource):
+class Approve(Resource):
 
     @Decorators.req_admin
     @enable_cors
@@ -138,7 +138,7 @@ class User(Resource):
 
 @api.route('/reject/<form_id>')
 @api.doc(responses=FormMeta.RESPONSE_CODE)
-class User(Resource):
+class Reject(Resource):
 
     @Decorators.req_admin
     @enable_cors
@@ -152,7 +152,7 @@ class User(Resource):
 
 @api.route('/me')
 @api.doc(responses=FormMeta.RESPONSE_CODE)
-class User(Resource):
+class MyFroms(Resource):
 
     @Decorators.req_login
     @enable_cors
@@ -168,7 +168,7 @@ class User(Resource):
 
 @api.route('/me/<form_id>')
 @api.doc(responses=FormMeta.RESPONSE_CODE)
-class User(Resource):
+class MyFromById(Resource):
 
     @Decorators.req_login
     @enable_cors
