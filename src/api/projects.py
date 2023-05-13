@@ -20,13 +20,13 @@ api = ProjectsMeta.api
 @api.route('')
 @api.doc(responses=ProjectsMeta.RESPONSE_CODE)
 class Fetch(Resource):
-    """
-        Get all projects
-    """
+
     @api.marshal_with(ProjectsMeta.response)
-    # @Decorators.req_login
     @enable_cors
     def get(self):
+        """
+            Anyone Get all projects
+        """
         page = py_.get(request.args, "page", 1)
         page_size = py_.get(request.args, "page_size", 10)
         all_projects = Controllers.Projects.get_all_projects(page, page_size)
@@ -36,13 +36,13 @@ class Fetch(Resource):
 @api.route('/<project_id>')
 @api.doc(responses=ProjectsMeta.RESPONSE_CODE)
 class GetById(Resource):
-    """
-        Get project by id
-    """
+
     @api.marshal_with(ProjectsMeta.response)
-    # @Decorators.req_login
     @enable_cors
     def get(self, project_id):
+        """
+            Anyone Get project by id
+        """
         project = Controllers.Projects.get_project_by_id(project_id)
         return ResponseMsg.SUCCESS.to_json(data={"project": project})
 
