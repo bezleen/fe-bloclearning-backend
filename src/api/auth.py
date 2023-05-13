@@ -13,6 +13,7 @@ import src.functions as funcs
 from src.config import DefaultConfig as Conf
 import src.enums as Enums
 from src.utils.util_datetime import tzware_timestamp
+from src.middlewares.http import make_cross_resp
 from flask_cors import cross_origin
 api = AuthMeta.api
 
@@ -25,7 +26,7 @@ class Login(Resource):
     """
     @api.expect(AuthMeta.in_login)
     @api.marshal_with(AuthMeta.resp_login)
-    @cross_origin()
+    @make_cross_resp
     def post(self):
         data = marshal(request.get_json(), AuthMeta.in_login)
         signature = py_.get(data, "signature")
@@ -47,7 +48,7 @@ class AdminLogin(Resource):
     """
     @api.expect(AuthMeta.in_admin_login)
     @api.marshal_with(AuthMeta.resp_admin_login)
-    @cross_origin()
+    @make_cross_resp
     def post(self):
         data = marshal(request.get_json(), AuthMeta.in_admin_login)
         username = py_.get(data, "username")
@@ -65,7 +66,7 @@ class RefreshToken(Resource):
         Refresh token
     """
     @api.expect(AuthMeta.in_refresh_token)
-    @cross_origin()
+    @make_cross_resp
     def post(self):
         data = marshal(request.get_json(), AuthMeta.in_refresh_token)
         refresh_token = py_.get(data, "refresh_token")
@@ -87,7 +88,7 @@ class ServerTime(Resource):
         Get current server time
     """
     @ api.marshal_with(AuthMeta.response)
-    @cross_origin()
+    @make_cross_resp
     def get(self):
 
         return ResponseMsg.SUCCESS.to_json(data={
