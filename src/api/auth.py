@@ -13,7 +13,6 @@ import src.functions as funcs
 from src.config import DefaultConfig as Conf
 import src.enums as Enums
 from src.utils.util_datetime import tzware_timestamp
-from src.middlewares.http import cross_origin
 from flask_cors import cross_origin
 api = AuthMeta.api
 
