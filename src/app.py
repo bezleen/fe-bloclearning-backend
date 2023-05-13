@@ -22,8 +22,10 @@ def create_app(config=None, app_name=None):
     if app_name is None:
         app_name = DefaultConfig.PROJECT
 
-    app = SecureFlask(app_name, instance_relative_config=True, md5_endpoints=DefaultConfig.MD5_ENDPOINTS)
+    app = SecureFlask(app_name, instance_relative_config=True,
+                      md5_endpoints=DefaultConfig.MD5_ENDPOINTS)
     CORS(app)
+    app.config['CORS_HEADERS'] = 'Content-Type'
     app.static_url_path = ''
     app.static_folder = 'src/static'
     configure_app(app, config)
