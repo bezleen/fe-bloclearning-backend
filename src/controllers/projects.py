@@ -193,14 +193,16 @@ class Projects(object):
         current_stage = py_.get(project_info, "stage")
         if current_stage != Enums.ProjectStage.PENDING.value:
             return False
-        initiated_timestamp = tzware_timestamp()
+        initiated_dt = tzware_datetime()
         Repo.mProjects.update_raw(
             {"_id": ObjectId(project_id)},
             {
                 "$set": {
                     "stage": Enums.ProjectStage.PRE_QUALIFICATION.value,
-                    "stage_detail.pre_qualified.initiated": initiated_timestamp,
+                    "stage_detail.pre_qualified.initiated": int(initiated_dt.timestamp()),
                     "stage_detail.pre_qualified.approval": 0.0,
+                    # FIXME: set dynamic
+                    "stage_detail.pre_qualified.exp": int((initiated_dt + datetime.timedelta(seconds=60)).timestamp())
                 }
             }
         )

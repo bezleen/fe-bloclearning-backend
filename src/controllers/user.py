@@ -30,12 +30,13 @@ class User(object):
             user_id = ObjectId(user_id)
         _filter = {"_id": user_id}
         user_info = Repo.mUser.get_item_with(_filter)
+        current_role = py_.get(user_info, "read_only.role")
         if not user_info:
             return
         profile = {
             "user_id": str(user_id),
             "name": py_.get(user_info, "read_only.name"),
-            "role": py_.get(user_info, "read_only.role"),
+            "role": py_.filter_(list(current_role.keys()), lambda x: current_role[x] == 1),
             "avatar": py_.get(user_info, "read_only.avatar"),
             'occupation': py_.get(user_info, "read_only.occupation"),
             'work_at': py_.get(user_info, "read_only.work_at"),

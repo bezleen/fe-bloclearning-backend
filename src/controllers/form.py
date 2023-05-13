@@ -181,7 +181,7 @@ class Form(object):
                 "type": form_type,
                 "candidate_id": str(candidate_id),
                 "candidate_name": candidate_name,
-                "current_role": current_role,
+                "current_role": py_.filter_(list(current_role.keys()), lambda x: current_role[x] == 1),
                 "avatar": avatar,
                 "status": form_status
             })
@@ -224,7 +224,7 @@ class Form(object):
             "custom_data": custom_data,
             "candidate_id": str(candidate_id),
             "candidate_name": candidate_name,
-            "current_role": current_role,
+            "current_role": py_.filter_(list(current_role.keys()), lambda x: current_role[x] == 1),
             "avatar": avatar,
             "occupation": occupation,
             "work_at": work_at,
@@ -306,7 +306,7 @@ class Form(object):
                 "type": form_type,
                 "candidate_id": str(candidate_id),
                 "candidate_name": candidate_name,
-                "current_role": current_role,
+                "current_role": py_.filter_(list(current_role.keys()), lambda x: current_role[x] == 1),
                 "avatar": avatar,
                 "status": form_status
             })
@@ -352,7 +352,7 @@ class Form(object):
             "custom_data": custom_data,
             "candidate_id": str(candidate_id),
             "candidate_name": candidate_name,
-            "current_role": current_role,
+            "current_role": py_.filter_(list(current_role.keys()), lambda x: current_role[x] == 1),
             "avatar": avatar,
             "occupation": occupation,
             "work_at": work_at,
