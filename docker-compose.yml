@@ -2,7 +2,7 @@ version: "3"
 
 services:
   api:
-    container_name: orasci
+    container_name: fe_block_learning
     build: .
     restart: on-failure
     volumes:
@@ -14,5 +14,5 @@ services:
       - PYTHONUNBUFFERED=true
     env_file:
       - .env
-    command: python3 manage.py run
+    # command: python3 manage.py run
     # command: supervisord -n -c /etc/supervisor.d/supervisord.conf

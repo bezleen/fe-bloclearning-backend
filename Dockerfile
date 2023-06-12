@@ -10,9 +10,9 @@ RUN pip --no-cache-dir install -r requirements.txt && mkdir -p /var/log/apps
 
 
 COPY conf/uwsgi.ini /etc/uwsgi/
-COPY conf/supervisor/ /etc/supervisor.d/
+COPY conf/supervisor/services.conf /etc/supervisor/conf.d/
 COPY . /webapps
 
 WORKDIR /webapps
 
-# ENTRYPOINT [ "supervisord", "-n", "-c", "/etc/supervisor.d/supervisord.conf" ]
+ENTRYPOINT [ "supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]

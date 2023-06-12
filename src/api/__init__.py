@@ -12,9 +12,9 @@ api = ApiMeta.api
 
 # routing api for app
 api.add_namespace(AuthApi, path='/auth')
-api.add_namespace(ProjectsApi, path='/projects')
-api.add_namespace(UserApi, path='/user')
-api.add_namespace(FormApi, path='/forms')
+# api.add_namespace(ProjectsApi, path='/projects')
+# api.add_namespace(UserApi, path='/user')
+# api.add_namespace(FormApi, path='/forms')
 
 
 DEFAULT_BLUEPRINTS = [
